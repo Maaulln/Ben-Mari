@@ -24,6 +24,7 @@ Aplikasi web full-stack untuk manajemen klinik yang komprehensif dengan fitur ap
 ## Fitur Utama
 
 ### Admin Dashboard
+
 - Dashboard statistik klinik (pasien, dokter, pendapatan)
 - Manajemen data pasien (CRUD)
 - Manajemen data dokter dan spesialisasi
@@ -37,6 +38,7 @@ Aplikasi web full-stack untuk manajemen klinik yang komprehensif dengan fitur ap
 - Laporan harian/bulanan (kunjungan, pendapatan, stok)
 
 ### Dokter Portal
+
 - Dashboard statistik dokter (pasien hari ini, appointment pending)
 - Lihat jadwal dan daftar pasien pribadi
 - Manajemen appointment dengan pasien
@@ -46,6 +48,7 @@ Aplikasi web full-stack untuk manajemen klinik yang komprehensif dengan fitur ap
 - Lihat riwayat treatment pasien
 
 ### Pasien Portal
+
 - Registrasi dan login
 - Booking appointment (pilih dokter, spesialisasi, tanggal, jam, keluhan)
 - Lihat status appointment secara real-time
@@ -55,6 +58,7 @@ Aplikasi web full-stack untuk manajemen klinik yang komprehensif dengan fitur ap
 - Lihat tagihan dan status pembayaran
 
 ### Fitur Umum
+
 - Sistem autentikasi JWT (Laravel Sanctum)
 - Role-based access control (Admin, Dokter, Pasien)
 - Sistem antrian hybrid (walk-in + booking)
@@ -68,6 +72,7 @@ Aplikasi web full-stack untuk manajemen klinik yang komprehensif dengan fitur ap
 ## Tech Stack
 
 ### Frontend
+
 - **Framework**: React 18 + TypeScript
 - **Build Tool**: Vite
 - **Styling**: Tailwind CSS
@@ -77,6 +82,7 @@ Aplikasi web full-stack untuk manajemen klinik yang komprehensif dengan fitur ap
 - **Icons**: Lucide React
 
 ### Backend
+
 - **Framework**: Laravel 10
 - **Language**: PHP 8.1+
 - **Authentication**: Laravel Sanctum (JWT)
@@ -86,6 +92,7 @@ Aplikasi web full-stack untuk manajemen klinik yang komprehensif dengan fitur ap
 - **PHP Extension**: php-oci8 + Oracle Instant Client
 
 ### Infrastructure
+
 - **Containerization**: Docker & Docker Compose
 - **Package Manager Frontend**: pnpm
 - **Package Manager Backend**: Composer
@@ -220,6 +227,7 @@ Schema::create('appointment', function (Blueprint $table) {
 ### Troubleshooting Oracle Connection
 
 **Error: `oci8` extension not found:**
+
 ```bash
 # Cek extension aktif
 php -m | grep oci
@@ -229,6 +237,7 @@ php -m | grep oci
 ```
 
 **Error: `ORA-12541: TNS: no listener`:**
+
 ```bash
 # Pastikan Oracle service jalan
 docker-compose ps
@@ -237,12 +246,14 @@ telnet localhost 1521
 ```
 
 **Error: `ORA-01017: invalid username/password`:**
+
 ```bash
 # Untuk Oracle 21c, username pakai prefix C## untuk common user
 DB_USERNAME=C##KLINIK_ADMIN
 ```
 
 **Error: migration gagal karena nama tabel terlalu panjang:**
+
 ```bash
 # Oracle max 30 karakter (versi < 18c) atau 128 karakter (18c+)
 # Pastikan nama tabel tidak melebihi batas tersebut
@@ -265,12 +276,14 @@ DB_USERNAME=C##KLINIK_ADMIN
 ## Instalasi & Setup
 
 ### 1. Clone Repository
+
 ```bash
 git clone <repository-url>
 cd Ben-Mari
 ```
 
 ### 2. Setup Frontend
+
 ```bash
 pnpm install
 # Inisialisasi database backend dijelaskan di bagian Backend (gunakan `pnpm db:init` yang menjalankan artisan migrate)
@@ -278,6 +291,7 @@ pnpm db:init
 ```
 
 ### 3. Setup Backend
+
 ```bash
 cd backend
 composer install
@@ -291,6 +305,7 @@ php artisan db:seed
 ### 4. Environment Configuration
 
 **Backend** (`.env`):
+
 ```env
 APP_NAME=KlinikBenMari
 APP_ENV=local
@@ -317,12 +332,14 @@ SANCTUM_STATEFUL_DOMAINS=localhost:5173,127.0.0.1:5173
 ## Menjalankan Aplikasi
 
 **Terminal 1 — Frontend:**
+
 ```bash
 pnpm dev
 # Akses: http://localhost:5173
 ```
 
 **Terminal 2 — Backend:**
+
 ```bash
 cd backend
 php artisan serve
@@ -349,11 +366,11 @@ pnpm db:reset
 
 ### Demo Credentials
 
-| Role   | Email              | Password   |
-|--------|--------------------|------------|
-| Admin  | admin@klinik.com   | admin123   |
-| Dokter | maria@klinik.com   | dokter123  |
-| Pasien | budi@email.com     | pasien123  |
+| Role   | Email            | Password  |
+| ------ | ---------------- | --------- |
+| Admin  | admin@klinik.com | admin123  |
+| Dokter | maria@klinik.com | dokter123 |
+| Pasien | budi@email.com   | pasien123 |
 
 ---
 
@@ -432,65 +449,70 @@ docker-compose up -d
 
 ### Tabel Utama
 
-| Tabel              | Deskripsi                              |
-|--------------------|----------------------------------------|
-| USERS              | Akun user (admin, dokter, pasien)      |
-| PASIEN             | Data pasien klinik                     |
-| DOKTER             | Data dokter dan spesialisasi           |
-| JADWAL_DOKTER      | Jadwal praktek harian per dokter       |
-| APPOINTMENT        | Janji temu pasien dengan dokter        |
-| ANTRIAN            | Antrian aktif harian (walk-in+booking) |
-| VITAL_SIGNS        | Tanda vital pasien (diisi perawat)     |
-| REKAM_MEDIS        | Rekam medis dan history treatment      |
-| OBAT               | Master data obat                       |
-| STOK_OBAT_LOG      | Log keluar masuk stok obat             |
-| RESEP              | Resep obat untuk pasien                |
-| TAGIHAN            | Tagihan pasien                         |
-| TAGIHAN_DETAIL     | Rincian komponen biaya tagihan         |
+| Tabel          | Deskripsi                              |
+| -------------- | -------------------------------------- |
+| USERS          | Akun user (admin, dokter, pasien)      |
+| PASIEN         | Data pasien klinik                     |
+| DOKTER         | Data dokter dan spesialisasi           |
+| JADWAL_DOKTER  | Jadwal praktek harian per dokter       |
+| APPOINTMENT    | Janji temu pasien dengan dokter        |
+| ANTRIAN        | Antrian aktif harian (walk-in+booking) |
+| VITAL_SIGNS    | Tanda vital pasien (diisi perawat)     |
+| REKAM_MEDIS    | Rekam medis dan history treatment      |
+| OBAT           | Master data obat                       |
+| STOK_OBAT_LOG  | Log keluar masuk stok obat             |
+| RESEP          | Resep obat untuk pasien                |
+| TAGIHAN        | Tagihan pasien                         |
+| TAGIHAN_DETAIL | Rincian komponen biaya tagihan         |
 
 ---
 
 ## API Documentation
 
 ### Base URL
+
 ```
 http://localhost:8000/api
 ```
 
 ### Authentication
-| Method | Endpoint           | Deskripsi                    |
-|--------|--------------------|------------------------------|
-| POST   | /auth/register     | Register akun baru           |
-| POST   | /auth/login        | Login user                   |
-| POST   | /auth/logout       | Logout user                  |
-| GET    | /auth/me           | Get current user             |
+
+| Method | Endpoint       | Deskripsi          |
+| ------ | -------------- | ------------------ |
+| POST   | /auth/register | Register akun baru |
+| POST   | /auth/login    | Login user         |
+| POST   | /auth/logout   | Logout user        |
+| GET    | /auth/me       | Get current user   |
 
 ### Resource Endpoints (Protected)
-| Resource        | Endpoints                                                      |
-|-----------------|----------------------------------------------------------------|
-| Pasien          | GET/POST /pasien, GET/PUT/DELETE /pasien/{id}                  |
-| Dokter          | GET/POST /dokter, GET/PUT/DELETE /dokter/{id}                  |
-| Appointment     | GET/POST /appointment, GET/PUT/DELETE /appointment/{id}        |
-| Antrian         | GET/POST /antrian, PUT /antrian/{id}/status                    |
-| Vital Signs     | POST /vital-signs, GET /vital-signs/{appointment_id}           |
-| Rekam Medis     | GET/POST /rekam-medis, GET/PUT /rekam-medis/{id}               |
-| Obat            | GET/POST /obat, GET/PUT/DELETE /obat/{id}                      |
-| Resep           | GET/POST /resep, GET/PUT/DELETE /resep/{id}                    |
-| Tagihan         | GET/POST /tagihan, GET/PUT /tagihan/{id}                       |
+
+| Resource    | Endpoints                                               |
+| ----------- | ------------------------------------------------------- |
+| Pasien      | GET/POST /pasien, GET/PUT/DELETE /pasien/{id}           |
+| Dokter      | GET/POST /dokter, GET/PUT/DELETE /dokter/{id}           |
+| Appointment | GET/POST /appointment, GET/PUT/DELETE /appointment/{id} |
+| Antrian     | GET/POST /antrian, PUT /antrian/{id}/status             |
+| Vital Signs | POST /vital-signs, GET /vital-signs/{appointment_id}    |
+| Rekam Medis | GET/POST /rekam-medis, GET/PUT /rekam-medis/{id}        |
+| Obat        | GET/POST /obat, GET/PUT/DELETE /obat/{id}               |
+| Resep       | GET/POST /resep, GET/PUT/DELETE /resep/{id}             |
+| Tagihan     | GET/POST /tagihan, GET/PUT /tagihan/{id}                |
 
 ### Special Endpoints
-| Method | Endpoint                                  | Deskripsi                           |
-|--------|-------------------------------------------|-------------------------------------|
-| POST   | /appointment/{id}/checkin                 | Check-in pasien                     |
-| GET    | /dokter/{id}/slot-jam                     | Slot jam tersedia                   |
-| GET    | /dokter/{id}/jadwal                       | Jadwal praktek dokter               |
-| GET    | /dokter/{id}/dashboard/stats              | Statistik dashboard dokter          |
-| GET    | /pasien/{id}/appointment/terdekat         | Appointment terdekat pasien         |
-| GET    | /obat/alert-stok                          | Obat dengan stok menipis            |
-| GET    | /laporan/kunjungan                        | Laporan kunjungan harian/bulanan    |
-| GET    | /laporan/pendapatan                       | Laporan pendapatan per periode      |
+
+| Method | Endpoint                          | Deskripsi                        |
+| ------ | --------------------------------- | -------------------------------- |
+| POST   | /appointment/{id}/checkin         | Check-in pasien                  |
+| GET    | /dokter/{id}/slot-jam             | Slot jam tersedia                |
+| GET    | /dokter/{id}/jadwal               | Jadwal praktek dokter            |
+| GET    | /dokter/{id}/dashboard/stats      | Statistik dashboard dokter       |
+| GET    | /pasien/{id}/appointment/terdekat | Appointment terdekat pasien      |
+| GET    | /obat/alert-stok                  | Obat dengan stok menipis         |
+| GET    | /laporan/kunjungan                | Laporan kunjungan harian/bulanan |
+| GET    | /laporan/pendapatan               | Laporan pendapatan per periode   |
 
 ### Response Format
+
 ```json
 // Success
 {
@@ -511,6 +533,7 @@ http://localhost:8000/api
 ## User Roles & Flow
 
 ### Admin
+
 ```
 Login → Dashboard → Kelola Pasien/Dokter/Appointment
                  → Kelola Antrian Harian
@@ -520,6 +543,7 @@ Login → Dashboard → Kelola Pasien/Dokter/Appointment
 ```
 
 ### Dokter
+
 ```
 Login → Dashboard → Lihat Jadwal Hari Ini
                  → Pilih Pasien → Cek Vital Signs
@@ -528,6 +552,7 @@ Login → Dashboard → Lihat Jadwal Hari Ini
 ```
 
 ### Pasien
+
 ```
 Register/Login → Dashboard → Booking Appointment
                           → Check-in saat tiba
@@ -552,6 +577,7 @@ MENUNGGU → DIKONFIRMASI → HADIR → SELESAI
 ```
 
 Aturan keterlambatan:
+
 - Datang sebelum batas hadir (slot + 15 menit): status ON_TIME, masuk antrian normal
 - Datang 15–30 menit terlambat: status TERLAMBAT, digeser ke belakang antrian
 - Tidak check-in > 30 menit dari slot: status ABSEN, slot dibebaskan untuk walk-in
@@ -560,6 +586,7 @@ Aturan keterlambatan:
 ### Manajemen Antrian Hybrid
 
 Klinik menerima dua jenis pasien:
+
 - **Booking**: sudah punya slot, prioritas di depan walk-in
 - **Walk-in**: daftar di loket, mengisi slot kosong yang tersedia
 
@@ -589,11 +616,13 @@ Klinik menerima dua jenis pasien:
 ## Troubleshooting
 
 **Backend tidak bisa diakses (localhost:8000):**
+
 ```bash
 cd backend && php artisan serve
 ```
 
 **Database error / SQLite tidak connect:**
+
 ```bash
 pnpm db:reset && pnpm db:init
 # atau
@@ -601,6 +630,7 @@ cd backend && php artisan migrate:fresh --seed
 ```
 
 **401 Unauthorized:**
+
 ```bash
 # Clear localStorage di browser console
 localStorage.clear()
@@ -608,10 +638,12 @@ localStorage.clear()
 ```
 
 **CORS Error:**
+
 - Cek `config/cors.php` di backend
 - Pastikan `http://localhost:5173` di-allow
 
 **Port sudah digunakan:**
+
 ```bash
 lsof -ti:5173 | xargs kill -9  # Frontend
 lsof -ti:8000 | xargs kill -9  # Backend
