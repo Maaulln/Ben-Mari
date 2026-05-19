@@ -539,3 +539,23 @@ export const getResepBelumDiambil = async () => {
   });
   return response.data;
 };
+
+// =========================
+// PENGATURAN KLINIK
+// =========================
+export const getPengaturan = async () => {
+  const response = await api.get('/pengaturan');
+  return response.data;
+};
+
+export const updatePengaturan = async (data: {
+  nama_klinik: string;
+  alamat: string;
+  no_telepon: string;
+  email: string;
+  jam_operasional: string;
+  deskripsi?: string;
+}) => {
+  const response = await api.put('/pengaturan', data);
+  return response.data;
+};

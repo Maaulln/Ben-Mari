@@ -7,6 +7,7 @@ import {
   FileText,
   Pill,
   Receipt,
+  BarChart2,
   Settings,
   LogOut,
   Menu,
@@ -31,6 +32,7 @@ export function Sidebar({ currentPage, onNavigate, user, onLogout }: SidebarProp
     { id: 'rekam-medis', label: 'Rekam Medis', icon: FileText },
     { id: 'obat', label: 'Obat', icon: Pill },
     { id: 'tagihan', label: 'Tagihan', icon: Receipt },
+    { id: 'laporan', label: 'Laporan', icon: BarChart2 },
     { id: 'pengaturan', label: 'Pengaturan', icon: Settings },
   ];
 

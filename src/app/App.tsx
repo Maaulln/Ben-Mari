@@ -9,12 +9,13 @@ import { RekamMedis } from './pages/RekamMedis';
 import { Obat } from './pages/Obat';
 import { Tagihan } from './pages/Tagihan';
 import { Pengaturan } from './pages/Pengaturan';
+import { Laporan } from './pages/Laporan';
 import { DoctorApp } from './doctor/DoctorApp';
 import { PatientApp } from './patient/PatientApp';
 import { PatientRegister } from './patient/PatientRegister';
 import api from '../services/api';
 
-type PageType = 'dashboard' | 'pasien' | 'dokter' | 'appointment' | 'rekam-medis' | 'obat' | 'tagihan' | 'pengaturan';
+type PageType = 'dashboard' | 'pasien' | 'dokter' | 'appointment' | 'rekam-medis' | 'obat' | 'tagihan' | 'laporan' | 'pengaturan';
 
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -113,6 +114,8 @@ export default function App() {
         return <Obat />;
       case 'tagihan':
         return <Tagihan />;
+      case 'laporan':
+        return <Laporan />;
       case 'pengaturan':
         return <Pengaturan />;
       default:
