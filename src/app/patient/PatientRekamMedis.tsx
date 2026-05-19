@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Modal } from '../components/Modal';
-import { FileText, ChevronDown } from 'lucide-react';
+import { FileText, ChevronDown, Stethoscope, AlertCircle, Activity, Clipboard, Heart, Weight, StickyNote, Pill } from 'lucide-react';
 import { getRekamMedisPasien, getRekamMedisDetail, RekamMedisPasien } from '../../services/patientService';
 import { formatDate } from '../../utils/formatters';
 
@@ -125,111 +125,101 @@ export function PatientRekamMedis({ pasienId }: PatientRekamMedisProps) {
       >
         {selectedRekam && (
           <div className="space-y-4">
-            <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-sm text-gray-600 mb-2">
-                Diperiksa oleh
-              </p>
-
-              <p className="font-semibold text-gray-900">
-                {selectedRekam.dokter?.nama_dokter}
-              </p>
-
-              <p className="text-sm text-[#0F766E]">
-                {selectedRekam.dokter?.spesialisasi}
-              </p>
-
-              <p className="text-sm text-gray-500 mt-1">
-                {formatDate(selectedRekam.tgl_periksa)}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-sm font-medium text-gray-700 mb-1">
-                Keluhan
-              </p>
-
-              <p className="text-gray-900">
-                {selectedRekam.keluhan}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-sm font-medium text-gray-700 mb-1">
-                Diagnosis
-              </p>
-
-              <p className="text-gray-900 font-semibold">
-                {selectedRekam.diagnosis}
-              </p>
-            </div>
-
-            <div>
-              <p className="text-sm font-medium text-gray-700 mb-1">
-                Tindakan
-              </p>
-
-              <p className="text-gray-900">
-                {selectedRekam.tindakan}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm font-medium text-gray-700 mb-1">
-                  Tekanan Darah
-                </p>
-
-                <p className="text-gray-900">
-                  {selectedRekam.tekanan_darah} mmHg
-                </p>
+            {/* Dokter */}
+            <div className="bg-[#0F766E] bg-opacity-5 rounded-lg p-4 flex items-start gap-3">
+              <div className="w-10 h-10 bg-[#0F766E] rounded-full flex items-center justify-center shrink-0">
+                <Stethoscope size={18} className="text-white" />
               </div>
-
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-1">
-                  Berat Badan
-                </p>
-
-                <p className="text-gray-900">
-                  {selectedRekam.berat_badan} kg
-                </p>
+                <p className="text-xs text-gray-500">Diperiksa oleh</p>
+                <p className="font-semibold text-gray-900">{selectedRekam.dokter?.nama_dokter}</p>
+                <p className="text-sm text-[#0F766E]">{selectedRekam.dokter?.spesialisasi}</p>
+                <p className="text-sm text-gray-500 mt-0.5">{formatDate(selectedRekam.tgl_periksa)}</p>
               </div>
             </div>
 
+            {/* Keluhan */}
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center shrink-0">
+                <AlertCircle size={16} className="text-orange-500" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-1">Keluhan</p>
+                <p className="text-gray-900">{selectedRekam.keluhan}</p>
+              </div>
+            </div>
+
+            {/* Diagnosis */}
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
+                <Clipboard size={16} className="text-blue-500" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-1">Diagnosis</p>
+                <p className="text-gray-900 font-semibold">{selectedRekam.diagnosis}</p>
+              </div>
+            </div>
+
+            {/* Tindakan */}
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center shrink-0">
+                <Activity size={16} className="text-teal-500" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-700 mb-1">Tindakan</p>
+                <p className="text-gray-900">{selectedRekam.tindakan}</p>
+              </div>
+            </div>
+
+            {/* Vital Signs */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-gray-50 rounded-lg p-3 flex items-center gap-3">
+                <Heart size={18} className="text-red-400 shrink-0" />
+                <div>
+                  <p className="text-xs text-gray-500">Tekanan Darah</p>
+                  <p className="font-semibold text-gray-900">{selectedRekam.tekanan_darah} <span className="text-xs font-normal text-gray-500">mmHg</span></p>
+                </div>
+              </div>
+              <div className="bg-gray-50 rounded-lg p-3 flex items-center gap-3">
+                <Weight size={18} className="text-purple-400 shrink-0" />
+                <div>
+                  <p className="text-xs text-gray-500">Berat Badan</p>
+                  <p className="font-semibold text-gray-900">{selectedRekam.berat_badan} <span className="text-xs font-normal text-gray-500">kg</span></p>
+                </div>
+              </div>
+            </div>
+
+            {/* Catatan */}
             {selectedRekam.catatan_tambahan && (
-              <div>
-                <p className="text-sm font-medium text-gray-700 mb-1">
-                  Catatan Dokter
-                </p>
-
-                <p className="text-gray-900">
-                  {selectedRekam.catatan_tambahan}
-                </p>
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center shrink-0">
+                  <StickyNote size={16} className="text-yellow-500" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-700 mb-1">Catatan Dokter</p>
+                  <p className="text-gray-900">{selectedRekam.catatan_tambahan}</p>
+                </div>
               </div>
             )}
 
+            {/* Resep */}
             {selectedRekam.resep && selectedRekam.resep.length > 0 && (
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-2">
-                  Obat yang Diresepkan
-                </p>
-
+                <div className="flex items-center gap-2 mb-3">
+                  <Pill size={16} className="text-[#0F766E]" />
+                  <p className="text-sm font-medium text-gray-700">Obat yang Diresepkan</p>
+                </div>
                 <div className="space-y-2">
                   {selectedRekam.resep.map((r, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-blue-50 rounded-lg p-3"
-                    >
-                      <p className="font-medium text-gray-900">
-                        {r.nama_obat}
-                      </p>
-
-                      <p className="text-sm text-gray-600">
-                        {r.dosis} • {r.aturan_pakai}
-                      </p>
-
-                      <p className="text-sm text-gray-500">
-                        Jumlah: {r.jumlah} {r.satuan}
-                      </p>
+                    <div key={idx} className="bg-blue-50 rounded-lg p-3 flex items-start gap-3">
+                      <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center shrink-0 text-blue-600 font-bold text-sm">
+                        {idx + 1}
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{r.nama_obat}</p>
+                        <p className="text-sm text-gray-600">{r.dosis} &bull; {r.aturan_pakai}</p>
+                        <p className="text-sm text-gray-500">Jumlah: {r.jumlah} {r.satuan}</p>
+                      </div>
                     </div>
                   ))}
                 </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Badge } from '../components/Badge';
-import { Calendar, Clock, X } from 'lucide-react';
+import { Calendar, Clock, X, Stethoscope, AlertCircle } from 'lucide-react';
 import { getAppointmentPasien, cancelAppointment, AppointmentPasien } from '../../services/patientService';
 import { formatDate } from '../../utils/formatters';
 
@@ -17,15 +17,27 @@ export function PatientAppointment({ pasienId }: PatientAppointmentProps) {
     loadAppointments();
   }, [pasienId, activeTab]);
 
+  const isExpired = (apt: AppointmentPasien): boolean => {
+    const today = new Date().toISOString().split('T')[0];
+    const tgl = typeof apt.tgl_appointment === 'string'
+      ? apt.tgl_appointment.split('T')[0]
+      : apt.tgl_appointment;
+    return tgl < today && (apt.status === 'MENUNGGU' || apt.status === 'DIKONFIRMASI');
+  };
+
   const loadAppointments = async () => {
     try {
       setLoading(true);
-      const status = activeTab === 'mendatang' ? 'MENUNGGU' : '';
-      const data = await getAppointmentPasien(pasienId, status);
+      const data = await getAppointmentPasien(pasienId);
 
+      // Safety net: anggap expired jika tanggal sudah lewat tapi status belum diupdate backend
       const filtered = activeTab === 'riwayat'
-        ? data.filter(a => a.status === 'SELESAI' || a.status === 'BATAL')
-        : data;
+        ? data.filter(a =>
+            a.status === 'SELESAI' || a.status === 'BATAL' || a.status === 'ABSEN' || isExpired(a)
+          )
+        : data.filter(a =>
+            !isExpired(a) && (a.status === 'MENUNGGU' || a.status === 'DIKONFIRMASI' || a.status === 'HADIR')
+          );
 
       setAppointments(filtered);
     } catch (error) {
@@ -96,19 +108,28 @@ export function PatientAppointment({ pasienId }: PatientAppointmentProps) {
               <div key={apt.appointment_id} className="bg-white rounded-xl shadow-md p-5 border-l-4 border-[#0F766E]">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
-                    <h3 className="font-bold text-gray-900 text-lg">
-                      {apt.dokter?.nama_dokter}
-                    </h3>
-                    <p className="text-sm text-[#0F766E]">{apt.dokter?.SPESIALISASI}</p>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Stethoscope size={16} className="text-[#0F766E] shrink-0" />
+                      <h3 className="font-bold text-gray-900 text-lg leading-tight">
+                        {apt.dokter?.nama_dokter}
+                      </h3>
+                    </div>
+                    <p className="text-sm text-[#0F766E] ml-6">{apt.dokter?.spesialisasi}</p>
                   </div>
                   {activeTab === 'mendatang' && (
-                    <div className="bg-[#0F766E] text-white px-4 py-2 rounded-lg text-center">
-                      <p className="text-xs">No. Antrian</p>
-                      <p className="text-2xl font-bold">{apt.nomor_antrian}</p>
+                    <div className="flex flex-col items-end gap-2">
+                      <Badge status={apt.status} type="appointment" />
+                      <div className="bg-[#0F766E] text-white px-4 py-2 rounded-lg text-center">
+                        <p className="text-xs">No. Antrian</p>
+                        <p className="text-2xl font-bold">{apt.nomor_antrian}</p>
+                      </div>
                     </div>
                   )}
                   {activeTab === 'riwayat' && (
-                    <Badge status={apt.status} type="appointment" />
+                    <Badge
+                      status={isExpired(apt) ? 'ABSEN' : apt.status}
+                      type="appointment"
+                    />
                   )}
                 </div>
 
@@ -125,7 +146,10 @@ export function PatientAppointment({ pasienId }: PatientAppointmentProps) {
 
                 {apt.keluhan_awal && (
                   <div className="bg-gray-50 rounded-lg p-3 mb-3">
-                    <p className="text-xs text-gray-500 mb-1">Keluhan</p>
+                    <div className="flex items-center gap-1 mb-1">
+                      <AlertCircle size={12} className="text-gray-400" />
+                      <p className="text-xs text-gray-500">Keluhan</p>
+                    </div>
                     <p className="text-sm text-gray-700">{apt.keluhan_awal}</p>
                   </div>
                 )}

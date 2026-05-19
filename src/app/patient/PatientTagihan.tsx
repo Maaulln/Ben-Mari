@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Modal } from '../components/Modal';
 import { Badge } from '../components/Badge';
-import { Receipt } from 'lucide-react';
+import { Receipt, AlertCircle, CheckCircle, Stethoscope, CreditCard } from 'lucide-react';
 import {
   getTagihanPasien,
   getTagihanDetail,
@@ -61,8 +61,8 @@ export function PatientTagihan({
 
   const tagihanBelum = tagihanList.filter(
     (t) =>
-      t.status_bayar === 'BELUM' ||
-      t.status_bayar === 'CICIL'
+      t.status_bayar === 'BELUM_BAYAR' ||
+      t.status_bayar === 'SEBAGIAN'
   );
 
   const tagihanLunas = tagihanList.filter(
@@ -117,16 +117,21 @@ export function PatientTagihan({
 
                       <div className="flex items-start justify-between mb-3">
 
-                        <div>
-
-                          <p className="text-sm text-gray-600 mb-1">
-                            {formatDate(tagihan.tgl_tagihan)}
-                          </p>
-
-                          <p className="font-medium text-gray-900">
-                            {tagihan.appointment?.dokter?.nama_dokter}
-                          </p>
-
+                        <div className="flex items-start gap-3">
+                          <div className="w-9 h-9 bg-red-100 rounded-full flex items-center justify-center shrink-0">
+                            <AlertCircle size={18} className="text-red-500" />
+                          </div>
+                          <div>
+                            <p className="text-sm text-gray-600 mb-0.5">
+                              {formatDate(tagihan.tgl_tagihan)}
+                            </p>
+                            <div className="flex items-center gap-1.5">
+                              <Stethoscope size={13} className="text-gray-400" />
+                              <p className="font-medium text-gray-900">
+                                {tagihan.appointment?.dokter?.nama_dokter}
+                              </p>
+                            </div>
+                          </div>
                         </div>
 
                         <Badge
@@ -137,25 +142,22 @@ export function PatientTagihan({
                       </div>
 
                       <div className="bg-white rounded-lg p-4 mb-3">
-
-                        <div className="flex justify-between items-center mb-2">
-
-                          <span className="text-sm text-gray-600">
-                            Total Tagihan
-                          </span>
-
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-2 text-gray-600">
+                            <CreditCard size={16} />
+                            <span className="text-sm">Total Tagihan</span>
+                          </div>
                           <span className="text-2xl font-bold text-red-600">
                             {formatRupiah(tagihan.total_biaya)}
                           </span>
-
                         </div>
-
                       </div>
 
                       <button
                         onClick={() => handleOpenDetail(tagihan)}
-                        className="w-full py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors"
+                        className="w-full py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
                       >
+                        <Receipt size={15} />
                         Lihat Detail Tagihan
                       </button>
 
@@ -185,20 +187,24 @@ export function PatientTagihan({
                       className="bg-white rounded-lg shadow-sm p-4 flex items-center justify-between"
                     >
 
-                      <div>
-
-                        <p className="text-sm text-gray-600">
-                          {formatDate(tagihan.tgl_tagihan)}
-                        </p>
-
-                        <p className="font-medium text-gray-900">
-                          {tagihan.appointment?.dokter?.nama_dokter}
-                        </p>
-
-                        <p className="text-sm font-semibold text-[#0F766E]">
-                          {formatRupiah(tagihan.total_biaya)}
-                        </p>
-
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+                          <CheckCircle size={18} className="text-green-500" />
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">
+                            {formatDate(tagihan.tgl_tagihan)}
+                          </p>
+                          <div className="flex items-center gap-1.5">
+                            <Stethoscope size={13} className="text-gray-400" />
+                            <p className="font-medium text-gray-900">
+                              {tagihan.appointment?.dokter?.nama_dokter}
+                            </p>
+                          </div>
+                          <p className="text-sm font-semibold text-[#0F766E]">
+                            {formatRupiah(tagihan.total_biaya)}
+                          </p>
+                        </div>
                       </div>
 
                       <Badge

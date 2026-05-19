@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, ArrowRight, Check, Calendar as CalendarIcon, Clock } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Calendar as CalendarIcon, Clock, DollarSign, Stethoscope } from 'lucide-react';
 import {
   getDokterTersedia,
   getSlotJamTersedia,
@@ -226,7 +226,8 @@ export function PatientBuatAppointment({
                       <Clock size={14} />
                       <span className="text-xs">{dokter.jadwal_praktik}</span>
                     </div>
-                    <div>
+                    <div className="flex items-center gap-2">
+                      <DollarSign size={14} className="text-[#0F766E]" />
                       <span className="font-semibold text-[#0F766E]">
                         {formatRupiah(dokter.biaya_konsultasi)}
                       </span>
@@ -331,26 +332,40 @@ export function PatientBuatAppointment({
             <div className="bg-white rounded-xl p-6 mb-6">
               <h3 className="font-semibold text-gray-900 mb-4">Ringkasan Appointment</h3>
               <div className="space-y-3">
-                <div>
-                  <p className="text-sm text-gray-600">Dokter</p>
-                  <p className="font-medium text-gray-900">{selectedDokter.nama_dokter}</p>
-                  <p className="text-sm text-[#0F766E]">{selectedDokter.spesialisasi}</p>
+                <div className="flex items-start gap-3 pb-3 border-b">
+                  <div className="w-10 h-10 bg-[#0F766E] bg-opacity-10 rounded-full flex items-center justify-center shrink-0">
+                    <Stethoscope size={20} className="text-[#0F766E]" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-600">Dokter</p>
+                    <p className="font-medium text-gray-900">{selectedDokter.nama_dokter}</p>
+                    <p className="text-sm text-[#0F766E]">{selectedDokter.spesialisasi}</p>
+                  </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-sm text-gray-600">Tanggal</p>
-                    <p className="font-medium text-gray-900">{formatDate(selectedTanggal)}</p>
+                  <div className="flex items-start gap-2">
+                    <CalendarIcon size={16} className="text-gray-400 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-sm text-gray-600">Tanggal</p>
+                      <p className="font-medium text-gray-900">{formatDate(selectedTanggal)}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-gray-600">Jam</p>
-                    <p className="font-medium text-gray-900">{selectedJam}</p>
+                  <div className="flex items-start gap-2">
+                    <Clock size={16} className="text-gray-400 mt-0.5 shrink-0" />
+                    <div>
+                      <p className="text-sm text-gray-600">Jam</p>
+                      <p className="font-medium text-gray-900">{selectedJam}</p>
+                    </div>
                   </div>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-600">Perkiraan Biaya Konsultasi</p>
-                  <p className="text-xl font-bold text-[#0F766E]">
-                    {formatRupiah(selectedDokter.biaya_konsultasi)}
-                  </p>
+                <div className="flex items-start gap-2">
+                  <DollarSign size={16} className="text-[#0F766E] mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-sm text-gray-600">Perkiraan Biaya Konsultasi</p>
+                    <p className="text-xl font-bold text-[#0F766E]">
+                      {formatRupiah(selectedDokter.biaya_konsultasi)}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>

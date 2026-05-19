@@ -73,7 +73,18 @@ export function PatientRegister({ onBackToLogin, onSuccess }: PatientRegisterPro
 
     try {
       setLoading(true);
-      await registerPasien(formData);
+      await registerPasien({
+        NIK: formData.NIK,
+        nama_lengkap: formData.NAMA_LENGKAP,
+        tanggal_lahir: formData.TANGGAL_LAHIR,
+        jenis_kelamin: formData.JENIS_KELAMIN,
+        golongan_darah: formData.GOLONGAN_DARAH,
+        ALAMAT: formData.ALAMAT,
+        no_telepon: formData.NO_TELEPON,
+        EMAIL: formData.EMAIL,
+        password: formData.password,
+        konfirmasiPassword: formData.konfirmasiPassword,
+      });
       alert('Akun berhasil dibuat! Silakan login.');
       onSuccess();
     } catch (error: any) {

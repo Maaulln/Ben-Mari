@@ -18,7 +18,10 @@ export interface AppointmentPasien {
   jam_appointment: string;
   nomor_antrian: number;
   keluhan_awal: string;
-  status: 'MENUNGGU' | 'SELESAI' | 'BATAL';
+  status: 'MENUNGGU' | 'DIKONFIRMASI' | 'HADIR' | 'SELESAI' | 'BATAL' | 'ABSEN';
+  status_kehadiran?: 'BELUM_CHECKIN' | 'ON_TIME' | 'TERLAMBAT';
+  batas_hadir?: string;
+  waktu_checkin?: string;
   catatan: string;
   dokter?: {
     nama_dokter: string;
@@ -72,7 +75,15 @@ export interface TagihanPasien {
   biaya_obat: number;
   total_biaya: number;
   metode_bayar: string;
-  status_bayar: 'BELUM' | 'LUNAS' | 'CICIL';
+  status_bayar: 'BELUM_BAYAR' | 'SEBAGIAN' | 'LUNAS';
+  keterangan?: string;
+  details?: Array<{
+    detail_id: number;
+    keterangan: string;
+    jumlah: number;
+    harga_satuan: number;
+    subtotal: number;
+  }>;
   appointment?: {
     tgl_appointment: string;
     dokter?: {
@@ -240,4 +251,35 @@ export const registerPasien = async (
   data: RegisterPasienRequest
 ): Promise<void> => {
   await api.post('/auth/register', data);
+};
+
+// Check-in pasien ke klinik
+export const checkinAppointment = async (
+  appointmentId: number
+): Promise<{ status_kehadiran: string; nomor_antrian: number }> => {
+  const response = await api.post(`/appointment/${appointmentId}/checkin`);
+  return response.data;
+};
+
+// Antrian pasien
+export interface AntrianPasien {
+  antrian_id: number;
+  nomor_antrian: number;
+  tanggal: string;
+  status: 'MENUNGGU' | 'DIPANGGIL' | 'SELESAI' | 'BATAL';
+  jenis: 'WALKIN' | 'BOOKING';
+  dokter?: { nama_dokter: string };
+}
+
+export const getAntrianPasien = async (
+  pasienId: number,
+  tanggal?: string
+): Promise<AntrianPasien[]> => {
+  const response = await api.get('/antrian', {
+    params: {
+      pasien_id: pasienId,
+      tanggal: tanggal || new Date().toISOString().split('T')[0],
+    },
+  });
+  return response.data?.data ?? response.data;
 };

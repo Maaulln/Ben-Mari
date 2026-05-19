@@ -18,7 +18,7 @@ export function Tagihan() {
     try {
       setLoading(true);
       const response = await api.get('/tagihan');
-      setTagihanList(response.data);
+      setTagihanList(response.data.data);
     } catch (error) {
       console.error('Error fetching tagihan:', error);
     } finally {
@@ -40,7 +40,7 @@ export function Tagihan() {
     .reduce((sum, t) => sum + Number(t.total_biaya), 0);
 
   const totalBelum = tagihanList
-    .filter(t => t.status_bayar === 'BELUM')
+    .filter(t => t.status_bayar === 'BELUM_BAYAR')
     .reduce((sum, t) => sum + Number(t.total_biaya), 0);
 
   const rataRata = tagihanList.length > 0
@@ -87,7 +87,7 @@ export function Tagihan() {
         >
           <option value="">Semua Status</option>
           <option value="LUNAS">Lunas</option>
-          <option value="BELUM">Belum Dibayar</option>
+          <option value="BELUM_BAYAR">Belum Dibayar</option>
           <option value="CICIL">Cicil</option>
         </select>
       </div>
@@ -134,7 +134,7 @@ export function Tagihan() {
                     <Badge status={tagihan.status_bayar} type="payment" />
                   </td>
                   <td className="px-4 py-3 text-center">
-                    {tagihan.status_bayar === 'BELUM' && (
+                    {tagihan.status_bayar === 'BELUM_BAYAR' && (
                       <button
                         onClick={() => handleTandaiLunas(tagihan.tagihan_id)}
                         className="text-green-600 hover:text-green-800 font-medium text-sm flex items-center gap-1 mx-auto"

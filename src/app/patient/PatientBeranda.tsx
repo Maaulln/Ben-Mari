@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Calendar, FileText, Receipt, Plus, ChevronRight, Clock, Stethoscope } from 'lucide-react';
+import { Calendar, FileText, Receipt, Plus, ChevronRight, Clock, Stethoscope, DollarSign } from 'lucide-react';
 import {
   getAppointmentTerdekat,
   getDokterTersedia,
@@ -89,11 +89,14 @@ export function PatientBeranda({ pasienId, pasienNama, onNavigate }: PatientBera
             <div className="flex items-start justify-between mb-4">
               <div>
                 <p className="text-sm text-gray-500 mb-1">Appointment Terdekat</p>
-                <h3 className="text-xl font-bold text-gray-900">
-                  {appointmentTerdekat.dokter?.nama_dokter}
-                </h3>
-                <p className="text-sm text-[#0F766E]">
-                  {appointmentTerdekat.dokter?.SPESIALISASI}
+                <div className="flex items-center gap-2 mb-1">
+                  <Stethoscope size={18} className="text-[#0F766E]" />
+                  <h3 className="text-xl font-bold text-gray-900">
+                    {appointmentTerdekat.dokter?.nama_dokter}
+                  </h3>
+                </div>
+                <p className="text-sm text-[#0F766E] ml-6">
+                  {appointmentTerdekat.dokter?.spesialisasi}
                 </p>
               </div>
               <div className="text-right">
@@ -144,8 +147,8 @@ export function PatientBeranda({ pasienId, pasienNama, onNavigate }: PatientBera
             onClick={() => onNavigate('buat-appointment')}
             className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow text-left"
           >
-            <div className="w-12 h-12 bg-[#0F766E] bg-opacity-10 rounded-lg flex items-center justify-center mb-3">
-              <Plus className="text-[#0F766E]" size={24} />
+            <div className="w-12 h-12 bg-[#0F766E] rounded-xl flex items-center justify-center mb-3">
+              <Plus className="text-white" size={26} />
             </div>
             <h3 className="font-semibold text-gray-900">Buat Appointment</h3>
             <p className="text-xs text-gray-500 mt-1">Jadwalkan kunjungan</p>
@@ -155,8 +158,8 @@ export function PatientBeranda({ pasienId, pasienNama, onNavigate }: PatientBera
             onClick={() => onNavigate('appointment')}
             className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow text-left"
           >
-            <div className="w-12 h-12 bg-blue-500 bg-opacity-10 rounded-lg flex items-center justify-center mb-3">
-              <Calendar className="text-blue-500" size={24} />
+            <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mb-3">
+              <Calendar className="text-white" size={24} />
             </div>
             <h3 className="font-semibold text-gray-900">Riwayat Kunjungan</h3>
             <p className="text-xs text-gray-500 mt-1">Lihat jadwal Anda</p>
@@ -166,8 +169,8 @@ export function PatientBeranda({ pasienId, pasienNama, onNavigate }: PatientBera
             onClick={() => onNavigate('riwayat')}
             className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow text-left"
           >
-            <div className="w-12 h-12 bg-green-500 bg-opacity-10 rounded-lg flex items-center justify-center mb-3">
-              <FileText className="text-green-500" size={24} />
+            <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center mb-3">
+              <FileText className="text-white" size={24} />
             </div>
             <h3 className="font-semibold text-gray-900">Rekam Medis Saya</h3>
             <p className="text-xs text-gray-500 mt-1">Lihat riwayat medis</p>
@@ -177,8 +180,8 @@ export function PatientBeranda({ pasienId, pasienNama, onNavigate }: PatientBera
             onClick={() => onNavigate('tagihan')}
             className="bg-white rounded-xl shadow-md p-4 hover:shadow-lg transition-shadow text-left"
           >
-            <div className="w-12 h-12 bg-orange-500 bg-opacity-10 rounded-lg flex items-center justify-center mb-3">
-              <Receipt className="text-orange-500" size={24} />
+            <div className="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center mb-3">
+              <Receipt className="text-white" size={24} />
             </div>
             <h3 className="font-semibold text-gray-900">Tagihan Saya</h3>
             <p className="text-xs text-gray-500 mt-1">Cek pembayaran</p>
@@ -207,19 +210,19 @@ export function PatientBeranda({ pasienId, pasienNama, onNavigate }: PatientBera
                       <h3 className="font-semibold text-gray-900 truncate">
                         {dokter.nama_dokter}
                       </h3>
-                      <p className="text-sm text-[#0F766E]">{dokter.SPESIALISASI}</p>
+                      <p className="text-sm text-[#0F766E]">{dokter.spesialisasi}</p>
                     </div>
                   </div>
 
                   <div className="space-y-2 text-sm text-gray-600 mb-3">
                     <div className="flex items-center gap-2">
                       <Clock size={14} />
-                      <span className="text-xs">{dokter.JADWAL_PRAKTIK}</span>
+                      <span className="text-xs">{dokter.jadwal_praktik}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Receipt size={14} />
+                      <DollarSign size={14} className="text-[#0F766E]" />
                       <span className="text-xs font-semibold text-[#0F766E]">
-                        {formatRupiah(dokter.BIAYA_KONSULTASI)}
+                        {formatRupiah(dokter.biaya_konsultasi)}
                       </span>
                     </div>
                   </div>

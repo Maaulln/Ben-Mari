@@ -13,8 +13,8 @@ return new class extends Migration
             $table->foreignId('dokter_id')->constrained('dokter', 'dokter_id')->onDelete('cascade');
             $table->date('tanggal');
             $table->enum('sesi', ['PAGI', 'SIANG', 'SORE', 'MALAM']);
-            $table->time('jam_mulai');
-            $table->time('jam_selesai');
+            $table->string('jam_mulai', 5);
+            $table->string('jam_selesai', 5);
             $table->unsignedSmallInteger('kuota');
             $table->unsignedSmallInteger('terisi')->default(0);
             $table->enum('status', ['BUKA', 'PENUH', 'TUTUP', 'LIBUR'])->default('BUKA');

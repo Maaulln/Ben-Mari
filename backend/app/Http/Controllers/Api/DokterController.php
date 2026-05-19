@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Dokter;
 use App\Models\Appointment;
+use App\Models\JadwalDokter;
 use App\Models\Pasien;
 use App\Models\RekamMedis;
 use App\Models\SesiPraktik;
@@ -107,8 +108,8 @@ class DokterController extends Controller
         $slots = [];
 
         foreach ($sesiList as $sesi) {
-            $mulai    = \Carbon\Carbon::createFromFormat('H:i:s', $sesi->jam_mulai);
-            $selesai  = \Carbon\Carbon::createFromFormat('H:i:s', $sesi->jam_selesai);
+            $mulai    = \Carbon\Carbon::parse($sesi->jam_mulai);
+            $selesai  = \Carbon\Carbon::parse($sesi->jam_selesai);
             $tersedia = $sesi->status === 'BUKA' && $sesi->terisi < $sesi->kuota;
 
             $current = $mulai->copy();
@@ -196,6 +197,20 @@ class DokterController extends Controller
 
             'appointmentMenunggu' =>
                 $appointmentMenunggu,
+        ]);
+    }
+
+    // Jadwal mingguan dokter (JadwalDokter)
+    public function jadwal(int $dokterId)
+    {
+        $jadwal = JadwalDokter::where('dokter_id', $dokterId)
+            ->where('is_aktif', 1)
+            ->orderByRaw("FIELD(hari,'SENIN','SELASA','RABU','KAMIS','JUMAT','SABTU','MINGGU')")
+            ->get();
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $jadwal,
         ]);
     }
 

@@ -12,19 +12,26 @@ class Appointment extends Model
     public $timestamps = false;
     protected $primaryKey = 'appointment_id';
 
+    // Status: MENUNGGU → DIKONFIRMASI → HADIR → SELESAI | BATAL | ABSEN
     protected $fillable = [
         'pasien_id',
         'dokter_id',
+        'sesi_id',
         'tgl_appointment',
         'jam_appointment',
         'nomor_antrian',
         'keluhan_awal',
         'status',
         'catatan',
+        'batas_hadir',
+        'waktu_checkin',
+        'status_kehadiran',
     ];
 
     protected $casts = [
         'tgl_appointment' => 'date',
+        'batas_hadir'     => 'datetime',
+        'waktu_checkin'   => 'datetime',
     ];
 
     public function pasien(): BelongsTo
@@ -45,5 +52,15 @@ class Appointment extends Model
     public function tagihan(): HasOne
     {
         return $this->hasOne(Tagihan::class, 'appointment_id', 'appointment_id');
+    }
+
+    public function vitalSigns(): HasOne
+    {
+        return $this->hasOne(VitalSigns::class, 'appointment_id', 'appointment_id');
+    }
+
+    public function antrian(): HasOne
+    {
+        return $this->hasOne(Antrian::class, 'appointment_id', 'appointment_id');
     }
 }

@@ -401,3 +401,91 @@ export const changePassword = async (
 
   return response.data;
 };
+
+// =========================
+// VITAL SIGNS
+// =========================
+export interface VitalSignsData {
+  vs_id?: number;
+  appointment_id: number;
+  tekanan_darah?: string;
+  suhu_tubuh?: number;
+  berat_badan?: number;
+  tinggi_badan?: number;
+  saturasi_oksigen?: number;
+  catatan_perawat?: string;
+}
+
+export const getVitalSigns = async (
+  appointmentId: number
+): Promise<VitalSignsData | null> => {
+  const response = await api.get(`/vital-signs/${appointmentId}`);
+  return response.data?.data ?? null;
+};
+
+export const saveVitalSigns = async (
+  data: VitalSignsData
+): Promise<VitalSignsData> => {
+  const response = await api.post('/vital-signs', data);
+  return response.data?.data ?? response.data;
+};
+
+export const updateVitalSigns = async (
+  vsId: number,
+  data: Partial<VitalSignsData>
+): Promise<VitalSignsData> => {
+  const response = await api.put(`/vital-signs/${vsId}`, data);
+  return response.data?.data ?? response.data;
+};
+
+// =========================
+// ANTRIAN DOKTER
+// =========================
+export interface AntrianItem {
+  antrian_id: number;
+  pasien_id: number;
+  dokter_id: number;
+  appointment_id?: number;
+  nomor_antrian: number;
+  tanggal: string;
+  status: 'MENUNGGU' | 'DIPANGGIL' | 'SELESAI' | 'BATAL';
+  jenis: 'WALKIN' | 'BOOKING';
+  pasien?: { nama_lengkap: string };
+}
+
+export const getAntrianDokter = async (
+  dokterId: number,
+  tanggal?: string
+): Promise<AntrianItem[]> => {
+  const response = await api.get('/antrian', {
+    params: {
+      dokter_id: dokterId,
+      tanggal: tanggal || new Date().toISOString().split('T')[0],
+    },
+  });
+  return response.data?.data ?? response.data;
+};
+
+export const panggilAntrian = async (antrianId: number): Promise<AntrianItem> => {
+  const response = await api.put(`/antrian/${antrianId}/status`, {
+    status: 'DIPANGGIL',
+  });
+  return response.data?.data ?? response.data;
+};
+
+export const selesaikanAntrian = async (antrianId: number): Promise<AntrianItem> => {
+  const response = await api.put(`/antrian/${antrianId}/status`, {
+    status: 'SELESAI',
+  });
+  return response.data?.data ?? response.data;
+};
+
+// =========================
+// JADWAL MINGGUAN DOKTER
+// =========================
+export const getJadwalMingguan = async (
+  dokterId: number
+): Promise<any[]> => {
+  const response = await api.get(`/dokter/${dokterId}/jadwal`);
+  return response.data?.data ?? response.data;
+};

@@ -36,10 +36,10 @@ return [
     'connections' => [
 
         'sqlite' => [
-            'driver' => 'sqlite',
-            'url' => env('DATABASE_URL'),
-            'database' => env('DB_DATABASE', database_path('database.sqlite')),
-            'prefix' => '',
+            'driver'                  => 'sqlite',
+            'url'                     => env('DATABASE_URL'),
+            'database'                => env('DB_DATABASE', database_path('database.sqlite')),
+            'prefix'                  => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
@@ -105,6 +105,7 @@ return [
             'charset'        => env('DB_CHARSET', 'AL32UTF8'),
             'prefix'         => env('DB_PREFIX', ''),
             'prefix_schema'  => env('DB_PREFIX_SCHEMA', ''),
+            'date_format'    => 'Y-m-d H:i:s',
         ],
 
     ],

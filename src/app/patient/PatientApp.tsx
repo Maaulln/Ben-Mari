@@ -42,16 +42,7 @@ export function PatientApp({ onLogout }: PatientAppProps) {
   };
 
   const handleNavigateFromMenu = (page: string) => {
-    // Map menu items to pages
-    if (page === 'beranda') {
-      handleNavigate('beranda');
-    } else if (page === 'appointment') {
-      handleNavigate('appointment');
-    } else if (page === 'riwayat') {
-      handleNavigate('riwayat');
-    } else if (page === 'profil') {
-      handleNavigate('profil');
-    }
+    handleNavigate(page);
   };
 
   const handleAppointmentSuccess = () => {

@@ -4,21 +4,36 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\RekamMedis;
-use App\Models\Resep;
+use App\Models\Tagihan;
+use App\Models\TagihanDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class RekamMedisController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(
-            RekamMedis::with([
-                'appointment.pasien',
-                'dokter',
-                'resep.obat'
-            ])->get()
-        );
+        $query = RekamMedis::with([
+            'appointment.pasien',
+            'dokter',
+            'resep.obat',
+        ]);
+
+        if ($request->filled('dokter_id')) {
+            $query->where('dokter_id', $request->dokter_id);
+        }
+
+        if ($request->filled('pasien_id')) {
+            $query->whereHas('appointment', fn($q) =>
+                $q->where('pasien_id', $request->pasien_id)
+            );
+        }
+
+        if ($request->filled('appointment_id')) {
+            $query->where('appointment_id', $request->appointment_id);
+        }
+
+        return response()->json($query->orderBy('tgl_periksa', 'desc')->get());
     }
 
     public function store(Request $request)
@@ -93,58 +108,37 @@ class RekamMedisController extends Controller
                 'status' => 'SELESAI'
             ]);
 
-            // =========================
-            // BUAT TAGIHAN OTOMATIS
-            // =========================
-            $appointment = \App\Models\Appointment::find(
-                $validated['appointment_id']
-            );
+            $appointment = \App\Models\Appointment::find($validated['appointment_id']);
+            $dokter      = \App\Models\Dokter::find($validated['dokter_id']);
+            $biayaKonsultasi = $dokter ? (float) $dokter->biaya_konsultasi : 0;
 
-            $dokter = \App\Models\Dokter::find(
-                $validated['dokter_id']
-            );
-
-            $biayaKonsultasi = $dokter
-                ? $dokter->biaya_konsultasi
-                : 0;
-
-            \App\Models\Tagihan::create([
-                'pasien_id' =>
-                    $appointment->pasien_id,
-
-                'appointment_id' =>
-                    $validated['appointment_id'],
-
-                'tgl_tagihan' =>
-                    now()->toDateString(),
-
-                'biaya_konsultasi' =>
-                    $biayaKonsultasi,
-
-                'biaya_obat' =>
-                    0,
-
-                'total_biaya' =>
-                    $biayaKonsultasi,
-
-                'status_bayar' =>
-                    'BELUM',
-            ]);
-
-            // =========================
-            // CREATE RESEP
-            // =========================
+            // CREATE RESEP (status_ambil default: BELUM_DIAMBIL)
             if (isset($validated['resep'])) {
-
-                foreach (
-                    $validated['resep']
-                    as $r
-                ) {
-                    $rekamMedis
-                        ->resep()
-                        ->create($r);
+                foreach ($validated['resep'] as $r) {
+                    $rekamMedis->resep()->create(array_merge($r, [
+                        'status_ambil' => 'BELUM_DIAMBIL',
+                    ]));
                 }
             }
+
+            // BUAT TAGIHAN OTOMATIS + DETAIL
+            $tagihan = Tagihan::create([
+                'pasien_id'        => $appointment->pasien_id,
+                'appointment_id'   => $validated['appointment_id'],
+                'tgl_tagihan'      => now()->toDateString(),
+                'biaya_konsultasi' => $biayaKonsultasi,
+                'biaya_obat'       => 0,
+                'total_biaya'      => $biayaKonsultasi,
+                'status_bayar'     => 'BELUM_BAYAR',
+            ]);
+
+            // Detail: Jasa Dokter
+            TagihanDetail::create([
+                'tagihan_id'   => $tagihan->tagihan_id,
+                'keterangan'   => 'Jasa Dokter',
+                'jumlah'       => 1,
+                'harga_satuan' => $biayaKonsultasi,
+            ]);
 
             return response()->json(
                 $rekamMedis->load('resep'),
@@ -205,14 +199,10 @@ class RekamMedisController extends Controller
 
     public function destroy($id)
     {
-        $rekamMedis =
-            RekamMedis::findOrFail($id);
-
-        $rekamMedis->delete();
-
+        // Rekam medis bersifat permanen — tidak boleh dihapus (business rule)
         return response()->json([
-            'message' =>
-                'Rekam Medis deleted successfully'
-        ]);
+            'status'  => 'error',
+            'message' => 'Rekam medis tidak dapat dihapus. Lakukan koreksi melalui update.',
+        ], 403);
     }
 }

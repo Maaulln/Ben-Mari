@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Modal } from '../components/Modal';
-import { User, Edit2, Key } from 'lucide-react';
+import { User, Edit2, Key, MapPin, Phone, Mail, Droplet, Calendar, UserCircle, LogOut } from 'lucide-react';
 import {
   getProfilPasien,
   updateProfilPasien,
@@ -22,7 +22,7 @@ export function PatientProfil({ pasienId, onLogout }: PatientProfilProps) {
 
   const [editData, setEditData] = useState({
     ALAMAT: '',
-    NO_TELEPON: '',
+    no_telepon: '',
     EMAIL: '',
   });
 
@@ -43,7 +43,7 @@ export function PatientProfil({ pasienId, onLogout }: PatientProfilProps) {
       setProfil(data);
       setEditData({
         ALAMAT: data.ALAMAT,
-        NO_TELEPON: data.NO_TELEPON,
+        no_telepon: data.no_telepon,
         EMAIL: data.EMAIL,
       });
     } catch (error) {
@@ -139,7 +139,7 @@ export function PatientProfil({ pasienId, onLogout }: PatientProfilProps) {
             </div>
             <div>
               <h2 className="text-2xl font-bold">{profil.nama_lengkap}</h2>
-              <p className="opacity-90">NIK: {profil.nik}</p>
+              <p className="opacity-90">NIK: {profil.NIK}</p>
             </div>
           </div>
         </div>
@@ -165,44 +165,71 @@ export function PatientProfil({ pasienId, onLogout }: PatientProfilProps) {
         {/* Info Cards */}
         <div className="space-y-4">
           <div className="bg-white rounded-xl shadow-sm p-5">
-            <h3 className="font-semibold text-gray-900 mb-4">Informasi Pribadi</h3>
+            <div className="flex items-center gap-2 mb-4">
+              <UserCircle size={18} className="text-[#0F766E]" />
+              <h3 className="font-semibold text-gray-900">Informasi Pribadi</h3>
+            </div>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <p className="text-sm text-gray-500">Tanggal Lahir</p>
-                <p className="font-medium text-gray-900">{formatDate(profil.tanggal_lahir)}</p>
+              <div className="flex items-start gap-2">
+                <Calendar size={14} className="text-gray-400 mt-1 shrink-0" />
+                <div>
+                  <p className="text-sm text-gray-500">Tanggal Lahir</p>
+                  <p className="font-medium text-gray-900">{formatDate(profil.tanggal_lahir)}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Usia</p>
-                <p className="font-medium text-gray-900">{calculateAge(profil.tanggal_lahir)} tahun</p>
+              <div className="flex items-start gap-2">
+                <User size={14} className="text-gray-400 mt-1 shrink-0" />
+                <div>
+                  <p className="text-sm text-gray-500">Usia</p>
+                  <p className="font-medium text-gray-900">{calculateAge(profil.tanggal_lahir)} tahun</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Jenis Kelamin</p>
-                <p className="font-medium text-gray-900">
-                  {profil.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'}
-                </p>
+              <div className="flex items-start gap-2">
+                <User size={14} className="text-gray-400 mt-1 shrink-0" />
+                <div>
+                  <p className="text-sm text-gray-500">Jenis Kelamin</p>
+                  <p className="font-medium text-gray-900">
+                    {profil.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'}
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Golongan Darah</p>
-                <p className="font-medium text-gray-900">{profil.golongan_darah}</p>
+              <div className="flex items-start gap-2">
+                <Droplet size={14} className="text-gray-400 mt-1 shrink-0" />
+                <div>
+                  <p className="text-sm text-gray-500">Golongan Darah</p>
+                  <p className="font-medium text-gray-900">{profil.golongan_darah}</p>
+                </div>
               </div>
             </div>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm p-5">
-            <h3 className="font-semibold text-gray-900 mb-4">Kontak</h3>
+            <div className="flex items-center gap-2 mb-4">
+              <Phone size={18} className="text-[#0F766E]" />
+              <h3 className="font-semibold text-gray-900">Kontak</h3>
+            </div>
             <div className="space-y-3">
-              <div>
-                <p className="text-sm text-gray-500">Alamat</p>
-                <p className="font-medium text-gray-900">{profil.alamat}</p>
+              <div className="flex items-start gap-3">
+                <MapPin size={16} className="text-gray-400 mt-0.5 shrink-0" />
+                <div>
+                  <p className="text-sm text-gray-500">Alamat</p>
+                  <p className="font-medium text-gray-900">{profil.ALAMAT}</p>
+                </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-gray-500">No. Telepon</p>
-                  <p className="font-medium text-gray-900">{profil.no_telepon}</p>
+                <div className="flex items-start gap-3">
+                  <Phone size={14} className="text-gray-400 mt-1 shrink-0" />
+                  <div>
+                    <p className="text-sm text-gray-500">No. Telepon</p>
+                    <p className="font-medium text-gray-900">{profil.no_telepon}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">Email</p>
-                  <p className="font-medium text-gray-900">{profil.email}</p>
+                <div className="flex items-start gap-3">
+                  <Mail size={14} className="text-gray-400 mt-1 shrink-0" />
+                  <div>
+                    <p className="text-sm text-gray-500">Email</p>
+                    <p className="font-medium text-gray-900 break-all">{profil.EMAIL}</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -210,8 +237,9 @@ export function PatientProfil({ pasienId, onLogout }: PatientProfilProps) {
 
           <button
             onClick={onLogout}
-            className="w-full py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors"
+            className="w-full py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
           >
+            <LogOut size={18} />
             Logout
           </button>
         </div>
@@ -248,8 +276,8 @@ export function PatientProfil({ pasienId, onLogout }: PatientProfilProps) {
             </label>
             <input
               type="text"
-              value={editData.NO_TELEPON}
-              onChange={(e) => setEditData({ ...editData, NO_TELEPON: e.target.value })}
+              value={editData.no_telepon}
+              onChange={(e) => setEditData({ ...editData, no_telepon: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
               required
             />

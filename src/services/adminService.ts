@@ -177,7 +177,9 @@ export const getAllAppointment =
         DOKTER_ID: a.dokter_id,
 
         TGL_APPOINTMENT:
-          a.tgl_appointment,
+          a.tgl_appointment
+            ? String(a.tgl_appointment).split('T')[0]
+            : a.tgl_appointment,
 
         JAM_APPOINTMENT:
           a.jam_appointment,
@@ -271,64 +273,60 @@ export const getDashboardStats =
       .toISOString()
       .split('T')[0];
 
+    // Bar chart: appointment per hari untuk 7 hari terakhir
+    const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+    const appointmentChartData = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date();
+      d.setDate(d.getDate() - (6 - i));
+      const dateStr = d.toISOString().split('T')[0];
+      return {
+        hari: dayNames[d.getDay()],
+        tanggal: dateStr,
+        jumlah: apts.filter((a: any) => a.TGL_APPOINTMENT === dateStr).length,
+      };
+    });
+
     return {
-      totalPasien:
-        pasiens.length,
+      totalPasien: pasiens.length,
 
-      appointmentHariIni:
-        apts.filter(
-          (a: any) =>
-            a.TGL_APPOINTMENT ===
-            today
-        ).length,
+      appointmentHariIni: apts.filter(
+        (a: any) => a.TGL_APPOINTMENT === today
+      ).length,
 
-      tagihanPending:
-        tagihans.data.filter(
-          (t: any) =>
-            t.status_bayar ===
-            'BELUM'
-        ).length,
+      tagihanPending: tagihans.data.data.filter(
+        (t: any) => t.status_bayar === 'BELUM_BAYAR'
+      ).length,
 
-      stokMenipis:
-        obats.filter(
-          (o: any) =>
-            o.STOK_TERSEDIA < 20
-        ).length,
+      stokMenipis: obats.filter(
+        (o: any) => o.STOK_TERSEDIA < 20
+      ).length,
 
-      recentAppointments:
-        apts.slice(0, 5),
+      recentAppointments: apts.slice(0, 5),
+
+      appointmentChartData,
 
       statusDistribution: [
         {
           name: 'Menunggu',
-          value: apts.filter(
-            (a: any) =>
-              a.STATUS ===
-              'MENUNGGU'
-          ).length,
+          value: apts.filter((a: any) => a.STATUS === 'MENUNGGU').length,
           color: '#D97706',
         },
-
         {
           name: 'Selesai',
-          value: apts.filter(
-            (a: any) =>
-              a.STATUS ===
-              'SELESAI'
-          ).length,
+          value: apts.filter((a: any) => a.STATUS === 'SELESAI').length,
           color: '#059669',
         },
-
         {
           name: 'Batal',
-          value: apts.filter(
-            (a: any) =>
-              a.STATUS ===
-              'BATAL'
-          ).length,
+          value: apts.filter((a: any) => a.STATUS === 'BATAL').length,
           color: '#DC2626',
         },
-      ],
+        {
+          name: 'Hadir',
+          value: apts.filter((a: any) => a.STATUS === 'HADIR').length,
+          color: '#3B82F6',
+        },
+      ].filter(s => s.value > 0),
     };
   };
 
@@ -422,5 +420,122 @@ export const deleteObat = async (
     `/obat/${id}`
   );
 
+  return response.data;
+};
+
+export const getAlertStokObat = async () => {
+  const response = await api.get('/obat/alert-stok');
+  return response.data;
+};
+
+export const stokMasukObat = async (id: number, jumlah: number, keterangan?: string) => {
+  const response = await api.post(`/obat/${id}/stok-masuk`, { jumlah, keterangan });
+  return response.data;
+};
+
+// =========================
+// ANTRIAN MANAGEMENT
+// =========================
+export const getAntrianHariIni = async (dokterId?: number) => {
+  const response = await api.get('/antrian', {
+    params: { dokter_id: dokterId || '' },
+  });
+  return response.data;
+};
+
+export const createAntrianWalkin = async (data: {
+  pasien_id: number;
+  dokter_id: number;
+  tanggal?: string;
+}) => {
+  const response = await api.post('/antrian', { ...data, jenis: 'WALKIN' });
+  return response.data;
+};
+
+export const updateStatusAntrian = async (id: number, status: string) => {
+  const response = await api.put(`/antrian/${id}/status`, { status });
+  return response.data;
+};
+
+// =========================
+// JADWAL DOKTER
+// =========================
+export const getJadwalDokterTemplate = async (dokterId?: number) => {
+  const response = await api.get('/jadwal-dokter', {
+    params: { dokter_id: dokterId || '', is_aktif: true },
+  });
+  return response.data;
+};
+
+export const createJadwalDokter = async (data: {
+  dokter_id: number;
+  hari: string;
+  jam_mulai: string;
+  jam_selesai: string;
+  kuota?: number;
+}) => {
+  const response = await api.post('/jadwal-dokter', data);
+  return response.data;
+};
+
+export const deleteJadwalDokter = async (id: number) => {
+  const response = await api.delete(`/jadwal-dokter/${id}`);
+  return response.data;
+};
+
+// =========================
+// LAPORAN
+// =========================
+export const getLaporanKunjungan = async (params: {
+  periode?: 'harian' | 'bulanan';
+  tanggal?: string;
+  bulan?: number;
+  tahun?: number;
+}) => {
+  const response = await api.get('/laporan/kunjungan', { params });
+  return response.data;
+};
+
+export const getLaporanPendapatan = async (params: {
+  periode?: 'harian' | 'bulanan';
+  tanggal?: string;
+  bulan?: number;
+  tahun?: number;
+}) => {
+  const response = await api.get('/laporan/pendapatan', { params });
+  return response.data;
+};
+
+// =========================
+// TAGIHAN DETAIL
+// =========================
+export const getTagihanDetail = async (tagihanId: number) => {
+  const response = await api.get(`/tagihan/${tagihanId}`);
+  return response.data;
+};
+
+export const updateStatusTagihan = async (
+  id: number,
+  data: { status_bayar: string; metode_bayar?: string; keterangan?: string }
+) => {
+  const response = await api.put(`/tagihan/${id}`, data);
+  return response.data;
+};
+
+// =========================
+// RESEP STATUS AMBIL
+// =========================
+export const updateStatusAmbilResep = async (
+  resepId: number,
+  statusAmbil: 'BELUM_DIAMBIL' | 'SUDAH_DIAMBIL' | 'BATAL'
+) => {
+  const response = await api.put(`/resep/${resepId}`, { status_ambil: statusAmbil });
+  return response.data;
+};
+
+export const getResepBelumDiambil = async () => {
+  const response = await api.get('/resep', {
+    params: { status_ambil: 'BELUM_DIAMBIL' },
+  });
   return response.data;
 };

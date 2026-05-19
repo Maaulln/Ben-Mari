@@ -37,4 +37,14 @@ public $timestamps = false;
     {
         return $this->hasMany(RekamMedis::class, 'dokter_id', 'dokter_id');
     }
+
+    public function jadwalDokter(): HasMany
+    {
+        return $this->hasMany(JadwalDokter::class, 'dokter_id', 'dokter_id');
+    }
+
+    public function antrian(): HasMany
+    {
+        return $this->hasMany(Antrian::class, 'dokter_id', 'dokter_id');
+    }
 }

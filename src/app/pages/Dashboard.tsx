@@ -32,18 +32,15 @@ export function Dashboard() {
     return <div className="p-6 text-center">Loading data dashboard...</div>;
   }
 
-  const { totalPasien, appointmentHariIni, tagihanPending, stokMenipis, statusDistribution, recentAppointments } = stats;
-
-  // Chart data - Appointment per hari (Mocked for now as we don't have historical API)
-  const appointmentChartData = [
-    { hari: 'Sen', jumlah: 8 },
-    { hari: 'Sel', jumlah: 12 },
-    { hari: 'Rab', jumlah: 10 },
-    { hari: 'Kam', jumlah: 14 },
-    { hari: 'Jum', jumlah: 11 },
-    { hari: 'Sab', jumlah: 9 },
-    { hari: 'Min', jumlah: 5 },
-  ];
+  const {
+    totalPasien,
+    appointmentHariIni,
+    tagihanPending,
+    stokMenipis,
+    statusDistribution,
+    recentAppointments,
+    appointmentChartData,
+  } = stats;
 
   return (
     <div className="p-6 space-y-6">

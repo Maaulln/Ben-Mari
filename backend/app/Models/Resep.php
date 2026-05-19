@@ -14,14 +14,17 @@ class Resep extends Model
     // FIX ORACLE TIMESTAMP
     public $timestamps = false;
 
+    // status_ambil: BELUM_DIAMBIL → SUDAH_DIAMBIL (trigger stok berkurang) | BATAL
     protected $fillable = [
         'rekam_id',
         'obat_id',
         'nama_obat_manual',
         'dosis',
+        'durasi',
         'aturan_pakai',
         'jumlah',
         'catatan_resep',
+        'status_ambil',
     ];
 
     public function rekamMedis(): BelongsTo

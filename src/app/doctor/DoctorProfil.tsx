@@ -13,6 +13,84 @@ interface DoctorProfilProps {
   dokterId: number;
 }
 
+// ── Jadwal Praktik Widget ──────────────────────────────────────────────────
+
+const HARI_LIST = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+
+interface DayEntry {
+  hari: string;
+  aktif: boolean;
+  mulai: string;
+  selesai: string;
+}
+
+function parseJadwal(str: string): DayEntry[] {
+  const defaults: DayEntry[] = HARI_LIST.map(h => ({
+    hari: h, aktif: false, mulai: '08:00', selesai: '14:00',
+  }));
+  if (!str) return defaults;
+
+  // Handle range like "Senin-Jumat 08:00-14:00"
+  const segments = str.split(/[,;]/);
+  for (const seg of segments) {
+    const trimmed = seg.trim();
+    const timeMatch = trimmed.match(/(\d{2}:\d{2})-(\d{2}:\d{2})/);
+    const mulai = timeMatch ? timeMatch[1] : '08:00';
+    const selesai = timeMatch ? timeMatch[2] : '14:00';
+
+    const rangeMatch = trimmed.match(
+      /(Senin|Selasa|Rabu|Kamis|Jumat|Sabtu|Minggu)-(Senin|Selasa|Rabu|Kamis|Jumat|Sabtu|Minggu)/
+    );
+    if (rangeMatch) {
+      const start = HARI_LIST.indexOf(rangeMatch[1]);
+      const end   = HARI_LIST.indexOf(rangeMatch[2]);
+      for (let i = Math.min(start, end); i <= Math.max(start, end); i++) {
+        defaults[i].aktif  = true;
+        defaults[i].mulai  = mulai;
+        defaults[i].selesai = selesai;
+      }
+    } else {
+      for (const entry of defaults) {
+        if (trimmed.includes(entry.hari)) {
+          entry.aktif   = true;
+          entry.mulai   = mulai;
+          entry.selesai = selesai;
+        }
+      }
+    }
+  }
+
+  return defaults;
+}
+
+function serializeJadwal(entries: DayEntry[]): string {
+  const active = entries.filter(e => e.aktif);
+  if (active.length === 0) return '';
+
+  // Group consecutive days with identical times into one entry
+  const groups: { days: string[]; mulai: string; selesai: string }[] = [];
+  for (const entry of active) {
+    const last = groups[groups.length - 1];
+    if (last && last.mulai === entry.mulai && last.selesai === entry.selesai) {
+      last.days.push(entry.hari);
+    } else {
+      groups.push({ days: [entry.hari], mulai: entry.mulai, selesai: entry.selesai });
+    }
+  }
+
+  return groups
+    .map(g => {
+      const dayStr =
+        g.days.length >= 3
+          ? `${g.days[0]}-${g.days[g.days.length - 1]}`
+          : g.days.join(', ');
+      return `${dayStr} ${g.mulai}-${g.selesai}`;
+    })
+    .join('; ');
+}
+
+// ── Component ──────────────────────────────────────────────────────────────
+
 export function DoctorProfil({ dokterId }: DoctorProfilProps) {
   const [profil, setProfil] = useState<ProfilType | null>(null);
   const [loading, setLoading] = useState(true);
@@ -25,6 +103,10 @@ export function DoctorProfil({ dokterId }: DoctorProfilProps) {
     jadwal_praktik: '',
     biaya_konsultasi: 0,
   });
+
+  const [jadwalEntries, setJadwalEntries] = useState<DayEntry[]>(() =>
+    HARI_LIST.map(h => ({ hari: h, aktif: false, mulai: '08:00', selesai: '14:00' }))
+  );
 
   const [passwordData, setPasswordData] = useState({
     passwordLama: '',
@@ -54,8 +136,33 @@ export function DoctorProfil({ dokterId }: DoctorProfilProps) {
     }
   };
 
+  const openEditModal = () => {
+    if (!profil) return;
+    const entries = parseJadwal(profil.jadwal_praktik);
+    setJadwalEntries(entries);
+    setEditData({
+      no_telepon: profil.no_telepon,
+      email: profil.email,
+      jadwal_praktik: profil.jadwal_praktik,
+      biaya_konsultasi: profil.biaya_konsultasi,
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const updateJadwalEntry = (idx: number, field: keyof DayEntry, value: string | boolean) => {
+    setJadwalEntries(prev => {
+      const next = prev.map((e, i) => (i === idx ? { ...e, [field]: value } : e));
+      setEditData(ed => ({ ...ed, jadwal_praktik: serializeJadwal(next) }));
+      return next;
+    });
+  };
+
   const handleUpdateProfil = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!editData.jadwal_praktik) {
+      alert('Pilih minimal satu hari praktik');
+      return;
+    }
     try {
       await updateProfilDokter(dokterId, editData);
       alert('Profil berhasil diperbarui');
@@ -133,7 +240,7 @@ export function DoctorProfil({ dokterId }: DoctorProfilProps) {
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={() => setIsEditModalOpen(true)}
+                  onClick={openEditModal}
                   className="flex items-center gap-2 px-4 py-2 border border-[#0F766E] text-[#0F766E] hover:bg-[#0F766E] hover:text-white rounded-lg transition-colors"
                 >
                   <Edit2 size={16} />
@@ -244,18 +351,65 @@ export function DoctorProfil({ dokterId }: DoctorProfilProps) {
             />
           </div>
 
+          {/* ── Jadwal Praktik Widget ── */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Jadwal Praktik <span className="text-red-500">*</span>
             </label>
-            <textarea
-              value={editData.jadwal_praktik}
-              onChange={(e) => setEditData({ ...editData, jadwal_praktik: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
-              rows={2}
-              placeholder="Contoh: Senin-Jumat 08:00-14:00"
-              required
-            />
+            <div className="border border-gray-200 rounded-lg overflow-hidden">
+              {jadwalEntries.map((entry, i) => (
+                <div
+                  key={entry.hari}
+                  className={[
+                    'flex items-center gap-3 px-3 py-2.5',
+                    i > 0 ? 'border-t border-gray-100' : '',
+                    entry.aktif ? 'bg-teal-50' : 'bg-white',
+                  ].join(' ')}
+                >
+                  <input
+                    type="checkbox"
+                    id={`hari-${entry.hari}`}
+                    checked={entry.aktif}
+                    onChange={e => updateJadwalEntry(i, 'aktif', e.target.checked)}
+                    className="w-4 h-4 accent-[#0F766E] cursor-pointer"
+                  />
+                  <label
+                    htmlFor={`hari-${entry.hari}`}
+                    className="w-16 text-sm font-medium text-gray-700 cursor-pointer select-none"
+                  >
+                    {entry.hari}
+                  </label>
+
+                  {entry.aktif ? (
+                    <div className="flex items-center gap-2 flex-1">
+                      <input
+                        type="time"
+                        value={entry.mulai}
+                        onChange={e => updateJadwalEntry(i, 'mulai', e.target.value)}
+                        className="px-2 py-1 border border-gray-200 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#0F766E] bg-white"
+                      />
+                      <span className="text-gray-400 text-sm select-none">—</span>
+                      <input
+                        type="time"
+                        value={entry.selesai}
+                        onChange={e => updateJadwalEntry(i, 'selesai', e.target.value)}
+                        className="px-2 py-1 border border-gray-200 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#0F766E] bg-white"
+                      />
+                    </div>
+                  ) : (
+                    <span className="text-xs text-gray-400 flex-1 italic">Libur</span>
+                  )}
+                </div>
+              ))}
+            </div>
+
+            {editData.jadwal_praktik ? (
+              <p className="text-xs text-gray-500 mt-1.5">
+                Preview: <span className="font-medium text-gray-700">{editData.jadwal_praktik}</span>
+              </p>
+            ) : (
+              <p className="text-xs text-red-500 mt-1.5">Pilih minimal satu hari praktik</p>
+            )}
           </div>
 
           <div>
