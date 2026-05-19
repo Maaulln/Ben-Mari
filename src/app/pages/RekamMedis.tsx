@@ -1,22 +1,39 @@
-import { useState } from 'react';
-import { mockRekamMedis, mockPasien, mockDokter, mockResep, mockObat } from '../../data/mockData';
+import { useState, useEffect } from 'react';
 import { formatDate } from '../../utils/formatters';
 import { FileText, ArrowRight } from 'lucide-react';
+import api from '../../services/api';
 
 export function RekamMedis() {
-  const [selectedRekam, setSelectedRekam] = useState<number | null>(null);
+  const [rekamList, setRekamList] = useState<any[]>([]);
+  const [selectedRekam, setSelectedRekam] = useState<any | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  const rekamWithDetails = mockRekamMedis.map(rm => {
-    const apt = { PASIEN_ID: rm.APPOINTMENT_ID };
-    const pasien = mockPasien.find(p => p.PASIEN_ID === (rm.APPOINTMENT_ID === 2 ? 2 : 3));
-    const dokter = mockDokter.find(d => d.DOKTER_ID === rm.DOKTER_ID);
-    const resep = mockResep.filter(r => r.REKAM_ID === rm.REKAM_ID);
-    return { ...rm, pasien, dokter, resep };
-  });
+  useEffect(() => {
+    fetchRekamMedis();
+  }, []);
 
-  const selectedDetail = rekamWithDetails.find(r => r.REKAM_ID === selectedRekam);
+  const fetchRekamMedis = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/rekam-medis');
+      setRekamList(response.data);
+    } catch (error) {
+      console.error('Error fetching rekam medis:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  if (selectedDetail) {
+  const handleDetail = async (rekamId: number) => {
+    try {
+      const response = await api.get(`/rekam-medis/${rekamId}`);
+      setSelectedRekam(response.data);
+    } catch (error) {
+      console.error('Error fetching detail:', error);
+    }
+  };
+
+  if (selectedRekam) {
     return (
       <div className="p-6">
         <div className="mb-6 flex items-center gap-2">
@@ -38,33 +55,32 @@ export function RekamMedis() {
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-500">Nama:</span>
-                    <span className="font-medium">{selectedDetail.pasien?.NAMA_LENGKAP}</span>
+                    <span className="font-medium">{selectedRekam.appointment?.pasien?.nama_lengkap}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-500">NIK:</span>
-                    <span className="font-mono">{selectedDetail.pasien?.NIK}</span>
+                    <span className="font-mono">{selectedRekam.appointment?.pasien?.nik}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-500">Gol. Darah:</span>
-                    <span>{selectedDetail.pasien?.GOLONGAN_DARAH}</span>
+                    <span>{selectedRekam.appointment?.pasien?.golongan_darah}</span>
                   </div>
                 </div>
               </div>
-
               <div>
                 <h3 className="font-semibold text-gray-900 mb-4">Informasi Pemeriksaan</h3>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between">
                     <span className="text-gray-500">No. Rekam Medis:</span>
-                    <span className="font-mono">RM-{String(selectedDetail.REKAM_ID).padStart(3, '0')}/2026</span>
+                    <span className="font-mono">RM-{String(selectedRekam.rekam_id).padStart(3, '0')}/2026</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-500">Tanggal Periksa:</span>
-                    <span>{formatDate(selectedDetail.TGL_PERIKSA)}</span>
+                    <span>{formatDate(selectedRekam.tgl_periksa)}</span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-500">Dokter:</span>
-                    <span>{selectedDetail.dokter?.NAMA_DOKTER}</span>
+                    <span>{selectedRekam.dokter?.nama_dokter}</span>
                   </div>
                 </div>
               </div>
@@ -76,60 +92,61 @@ export function RekamMedis() {
             <div className="grid grid-cols-2 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-500 mb-1">Keluhan</label>
-                <p className="text-gray-900">{selectedDetail.KELUHAN}</p>
+                <p className="text-gray-900">{selectedRekam.keluhan}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-500 mb-1">Diagnosis</label>
-                <p className="text-gray-900 font-semibold">{selectedDetail.DIAGNOSIS}</p>
+                <p className="text-gray-900 font-semibold">{selectedRekam.diagnosis}</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-500 mb-1">Tindakan</label>
-                <p className="text-gray-900">{selectedDetail.TINDAKAN}</p>
+                <p className="text-gray-900">{selectedRekam.tindakan}</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-500 mb-1">Tekanan Darah</label>
-                  <p className="text-gray-900">{selectedDetail.TEKANAN_DARAH} mmHg</p>
+                  <p className="text-gray-900">{selectedRekam.tekanan_darah} mmHg</p>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-500 mb-1">Berat Badan</label>
-                  <p className="text-gray-900">{selectedDetail.BERAT_BADAN} kg</p>
+                  <p className="text-gray-900">{selectedRekam.berat_badan} kg</p>
                 </div>
               </div>
               <div className="col-span-2">
                 <label className="block text-sm font-medium text-gray-500 mb-1">Catatan Tambahan</label>
-                <p className="text-gray-900">{selectedDetail.CATATAN_TAMBAHAN}</p>
+                <p className="text-gray-900">{selectedRekam.catatan_tambahan || '-'}</p>
               </div>
             </div>
           </div>
 
           <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
             <h3 className="font-semibold text-gray-900 mb-4">Resep Obat</h3>
-            <table className="w-full">
-              <thead className="bg-gray-50 text-xs font-medium text-gray-500 uppercase">
-                <tr>
-                  <th className="px-4 py-2 text-left">Nama Obat</th>
-                  <th className="px-4 py-2 text-left">Dosis</th>
-                  <th className="px-4 py-2 text-left">Aturan Pakai</th>
-                  <th className="px-4 py-2 text-left">Jumlah</th>
-                  <th className="px-4 py-2 text-left">Catatan</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {selectedDetail.resep.map(r => {
-                  const obat = mockObat.find(o => o.OBAT_ID === r.OBAT_ID);
-                  return (
-                    <tr key={r.RESEP_ID}>
-                      <td className="px-4 py-3 text-sm text-gray-700">{obat?.NAMA_OBAT}</td>
-                      <td className="px-4 py-3 text-sm text-gray-700">{r.DOSIS}</td>
-                      <td className="px-4 py-3 text-sm text-gray-700">{r.ATURAN_PAKAI}</td>
-                      <td className="px-4 py-3 text-sm text-gray-700">{r.JUMLAH} {obat?.SATUAN}</td>
-                      <td className="px-4 py-3 text-sm text-gray-500">{r.CATATAN_RESEP}</td>
+            {selectedRekam.resep && selectedRekam.resep.length > 0 ? (
+              <table className="w-full">
+                <thead className="bg-gray-50 text-xs font-medium text-gray-500 uppercase">
+                  <tr>
+                    <th className="px-4 py-2 text-left">Nama Obat</th>
+                    <th className="px-4 py-2 text-left">Dosis</th>
+                    <th className="px-4 py-2 text-left">Aturan Pakai</th>
+                    <th className="px-4 py-2 text-left">Jumlah</th>
+                    <th className="px-4 py-2 text-left">Catatan</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {selectedRekam.resep.map((r: any) => (
+                    <tr key={r.resep_id}>
+                      <td className="px-4 py-3 text-sm text-gray-700">{r.obat?.nama_obat}</td>
+                      <td className="px-4 py-3 text-sm text-gray-700">{r.dosis}</td>
+                      <td className="px-4 py-3 text-sm text-gray-700">{r.aturan_pakai}</td>
+                      <td className="px-4 py-3 text-sm text-gray-700">{r.jumlah}</td>
+                      <td className="px-4 py-3 text-sm text-gray-500">{r.catatan_resep || '-'}</td>
                     </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <p className="text-sm text-gray-500 text-center py-4">Belum ada resep</p>
+            )}
           </div>
         </div>
       </div>
@@ -144,39 +161,54 @@ export function RekamMedis() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-            <tr>
-              <th className="px-4 py-3 text-left">No. Rekam</th>
-              <th className="px-4 py-3 text-left">Pasien</th>
-              <th className="px-4 py-3 text-left">Dokter</th>
-              <th className="px-4 py-3 text-left">Tgl. Periksa</th>
-              <th className="px-4 py-3 text-left">Diagnosis</th>
-              <th className="px-4 py-3 text-center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {rekamWithDetails.map((rm) => (
-              <tr key={rm.REKAM_ID} className="hover:bg-gray-50">
-                <td className="px-4 py-3 text-sm font-mono text-gray-700">
-                  RM-{String(rm.REKAM_ID).padStart(3, '0')}/2026
-                </td>
-                <td className="px-4 py-3 text-sm text-gray-700">{rm.pasien?.NAMA_LENGKAP}</td>
-                <td className="px-4 py-3 text-sm text-gray-700">{rm.dokter?.NAMA_DOKTER}</td>
-                <td className="px-4 py-3 text-sm text-gray-700">{formatDate(rm.TGL_PERIKSA)}</td>
-                <td className="px-4 py-3 text-sm text-gray-700">{rm.DIAGNOSIS}</td>
-                <td className="px-4 py-3 text-center">
-                  <button
-                    onClick={() => setSelectedRekam(rm.REKAM_ID)}
-                    className="text-[#0F766E] hover:text-[#0D6B64] font-medium text-sm flex items-center gap-1 mx-auto"
-                  >
-                    Detail <ArrowRight size={14} />
-                  </button>
-                </td>
+        {loading ? (
+          <div className="p-8 text-center text-gray-500">Memuat data...</div>
+        ) : rekamList.length === 0 ? (
+          <div className="p-8 text-center text-gray-500">
+            <FileText className="mx-auto mb-2 text-gray-300" size={48} />
+            <p>Belum ada rekam medis</p>
+          </div>
+        ) : (
+          <table className="w-full">
+            <thead className="bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <tr>
+                <th className="px-4 py-3 text-left">No. Rekam</th>
+                <th className="px-4 py-3 text-left">Pasien</th>
+                <th className="px-4 py-3 text-left">Dokter</th>
+                <th className="px-4 py-3 text-left">Tgl. Periksa</th>
+                <th className="px-4 py-3 text-left">Diagnosis</th>
+                <th className="px-4 py-3 text-center">Aksi</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {rekamList.map((rm) => (
+                <tr key={rm.rekam_id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 text-sm font-mono text-gray-700">
+                    RM-{String(rm.rekam_id).padStart(3, '0')}/2026
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {rm.appointment?.pasien?.nama_lengkap}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {rm.dokter?.nama_dokter}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {formatDate(rm.tgl_periksa)}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700">{rm.diagnosis}</td>
+                  <td className="px-4 py-3 text-center">
+                    <button
+                      onClick={() => handleDetail(rm.rekam_id)}
+                      className="text-[#0F766E] hover:text-[#0D6B64] font-medium text-sm flex items-center gap-1 mx-auto"
+                    >
+                      Detail <ArrowRight size={14} />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

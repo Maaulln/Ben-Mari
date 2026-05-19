@@ -40,7 +40,7 @@ export function PatientBuatAppointment({
 
   useEffect(() => {
     if (preselectedDokterId && dokterList.length > 0) {
-      const dokter = dokterList.find((d) => d.DOKTER_ID === preselectedDokterId);
+      const dokter = dokterList.find((d) => d.dokter_id === preselectedDokterId);
       if (dokter) {
         setSelectedDokter(dokter);
         setStep(2);
@@ -66,7 +66,7 @@ export function PatientBuatAppointment({
   const loadSlotJam = async () => {
     if (!selectedDokter) return;
     try {
-      const data = await getSlotJamTersedia(selectedDokter.DOKTER_ID, selectedTanggal);
+      const data = await getSlotJamTersedia(selectedDokter.dokter_id, selectedTanggal);
       setSlotJam(data);
     } catch (error) {
       console.error('Error loading slot jam:', error);
@@ -80,13 +80,13 @@ export function PatientBuatAppointment({
       setLoading(true);
       const result = await createAppointment({
         pasien_id: pasienId,
-        dokter_id: selectedDokter.DOKTER_ID,
+        dokter_id: selectedDokter.dokter_id,
         tgl_appointment: selectedTanggal,
         jam_appointment: selectedJam,
         keluhan_awal: keluhan,
       });
 
-      setNomorAntrian(result.NOMOR_ANTRIAN);
+      setNomorAntrian(result.nomor_antrian);
       setShowSuccess(true);
     } catch (error) {
       console.error('Error creating appointment:', error);
@@ -118,7 +118,7 @@ export function PatientBuatAppointment({
             <div className="border-t border-[#0F766E] border-opacity-20 pt-4 text-left space-y-2">
               <p className="text-sm">
                 <span className="text-gray-600">Dokter:</span>{' '}
-                <span className="font-medium">{selectedDokter?.NAMA_DOKTER}</span>
+                <span className="font-medium">{selectedDokter?.nama_dokter}</span>
               </p>
               <p className="text-sm">
                 <span className="text-gray-600">Tanggal:</span>{' '}
@@ -198,23 +198,23 @@ export function PatientBuatAppointment({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredDokter.map((dokter) => (
                 <button
-                  key={dokter.DOKTER_ID}
+                  key={dokter.dokter_id}
                   onClick={() => {
                     setSelectedDokter(dokter);
                     setStep(2);
                   }}
                   className={`bg-white rounded-xl p-4 text-left hover:shadow-lg transition-all border-2 ${
-                    selectedDokter?.DOKTER_ID === dokter.DOKTER_ID
+                    selectedDokter?.dokter_id === dokter.dokter_id
                       ? 'border-[#0F766E]'
                       : 'border-transparent'
                   }`}
                 >
                   <div className="flex items-start gap-3 mb-3">
                     <div className="w-14 h-14 bg-[#0F766E] rounded-full flex items-center justify-center text-white text-xl font-semibold shrink-0">
-                      {dokter.NAMA_DOKTER.charAt(0)}
+                      {dokter.nama_dokter.charAt(0)}
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900">{dokter.NAMA_DOKTER}</h3>
+                      <h3 className="font-semibold text-gray-900">{dokter.nama_dokter}</h3>
                       <p className="text-sm text-[#0F766E]">{dokter.SPESIALISASI}</p>
                     </div>
                   </div>
@@ -243,7 +243,7 @@ export function PatientBuatAppointment({
 
             <div className="bg-white rounded-xl p-4 mb-6">
               <p className="text-sm text-gray-600 mb-1">Dokter yang dipilih:</p>
-              <p className="font-semibold text-gray-900">{selectedDokter.NAMA_DOKTER}</p>
+              <p className="font-semibold text-gray-900">{selectedDokter.nama_dokter}</p>
               <p className="text-sm text-[#0F766E]">{selectedDokter.SPESIALISASI}</p>
             </div>
 
@@ -320,7 +320,7 @@ export function PatientBuatAppointment({
               <div className="space-y-3">
                 <div>
                   <p className="text-sm text-gray-600">Dokter</p>
-                  <p className="font-medium text-gray-900">{selectedDokter.NAMA_DOKTER}</p>
+                  <p className="font-medium text-gray-900">{selectedDokter.nama_dokter}</p>
                   <p className="text-sm text-[#0F766E]">{selectedDokter.SPESIALISASI}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">

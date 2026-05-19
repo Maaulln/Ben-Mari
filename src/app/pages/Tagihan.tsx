@@ -1,37 +1,55 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StatCard } from '../components/StatCard';
 import { Badge } from '../components/Badge';
 import { DollarSign, TrendingUp, CreditCard, CheckCircle } from 'lucide-react';
-import { mockTagihan, mockPasien, Tagihan as TagihanType } from '../../data/mockData';
 import { formatRupiah, formatDate } from '../../utils/formatters';
+import api from '../../services/api';
 
 export function Tagihan() {
-  const [tagihanList, setTagihanList] = useState<TagihanType[]>(mockTagihan);
+  const [tagihanList, setTagihanList] = useState<any[]>([]);
   const [filterStatus, setFilterStatus] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchTagihan();
+  }, []);
+
+  const fetchTagihan = async () => {
+    try {
+      setLoading(true);
+      const response = await api.get('/tagihan');
+      setTagihanList(response.data);
+    } catch (error) {
+      console.error('Error fetching tagihan:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleTandaiLunas = async (id: number) => {
+    try {
+      await api.put(`/tagihan/${id}`, { status_bayar: 'LUNAS' });
+      fetchTagihan();
+    } catch (error) {
+      console.error('Error updating tagihan:', error);
+    }
+  };
 
   const totalPendapatan = tagihanList
-    .filter(t => t.STATUS_BAYAR === 'LUNAS')
-    .reduce((sum, t) => sum + t.TOTAL_BIAYA, 0);
+    .filter(t => t.status_bayar === 'LUNAS')
+    .reduce((sum, t) => sum + Number(t.total_biaya), 0);
 
   const totalBelum = tagihanList
-    .filter(t => t.STATUS_BAYAR === 'BELUM')
-    .reduce((sum, t) => sum + t.TOTAL_BIAYA, 0);
+    .filter(t => t.status_bayar === 'BELUM')
+    .reduce((sum, t) => sum + Number(t.total_biaya), 0);
 
   const rataRata = tagihanList.length > 0
-    ? tagihanList.reduce((sum, t) => sum + t.TOTAL_BIAYA, 0) / tagihanList.length
+    ? tagihanList.reduce((sum, t) => sum + Number(t.total_biaya), 0) / tagihanList.length
     : 0;
 
   const filteredTagihan = filterStatus
-    ? tagihanList.filter(t => t.STATUS_BAYAR === filterStatus)
+    ? tagihanList.filter(t => t.status_bayar === filterStatus)
     : tagihanList;
-
-  const handleTandaiLunas = (id: number) => {
-    setTagihanList(
-      tagihanList.map(t =>
-        t.TAGIHAN_ID === id ? { ...t, STATUS_BAYAR: 'LUNAS' as 'LUNAS' } : t
-      )
-    );
-  };
 
   return (
     <div className="p-6">
@@ -40,7 +58,6 @@ export function Tagihan() {
         <p className="text-gray-500 mt-1">Kelola pembayaran dan keuangan klinik</p>
       </div>
 
-      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <StatCard
           title="Total Pendapatan Bulan Ini"
@@ -62,7 +79,6 @@ export function Tagihan() {
         />
       </div>
 
-      {/* Filter */}
       <div className="mb-6">
         <select
           value={filterStatus}
@@ -76,40 +92,51 @@ export function Tagihan() {
         </select>
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-            <tr>
-              <th className="px-4 py-3 text-left">Pasien</th>
-              <th className="px-4 py-3 text-left">Tgl. Tagihan</th>
-              <th className="px-4 py-3 text-left">Biaya Konsultasi</th>
-              <th className="px-4 py-3 text-left">Biaya Obat</th>
-              <th className="px-4 py-3 text-left">Total</th>
-              <th className="px-4 py-3 text-left">Metode Bayar</th>
-              <th className="px-4 py-3 text-left">Status</th>
-              <th className="px-4 py-3 text-center">Aksi</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {filteredTagihan.map((tagihan) => {
-              const pasien = mockPasien.find(p => p.PASIEN_ID === tagihan.PASIEN_ID);
-
-              return (
-                <tr key={tagihan.TAGIHAN_ID} className="hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm text-gray-700">{pasien?.NAMA_LENGKAP}</td>
-                  <td className="px-4 py-3 text-sm text-gray-700">{formatDate(tagihan.TGL_TAGIHAN)}</td>
-                  <td className="px-4 py-3 text-sm text-gray-700">{formatRupiah(tagihan.BIAYA_KONSULTASI)}</td>
-                  <td className="px-4 py-3 text-sm text-gray-700">{formatRupiah(tagihan.BIAYA_OBAT)}</td>
-                  <td className="px-4 py-3 text-sm font-semibold text-[#0F766E]">{formatRupiah(tagihan.TOTAL_BIAYA)}</td>
-                  <td className="px-4 py-3 text-sm text-gray-700">{tagihan.METODE_BAYAR}</td>
+        {loading ? (
+          <div className="p-8 text-center text-gray-500">Memuat data...</div>
+        ) : (
+          <table className="w-full">
+            <thead className="bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <tr>
+                <th className="px-4 py-3 text-left">Pasien</th>
+                <th className="px-4 py-3 text-left">Tgl. Tagihan</th>
+                <th className="px-4 py-3 text-left">Biaya Konsultasi</th>
+                <th className="px-4 py-3 text-left">Biaya Obat</th>
+                <th className="px-4 py-3 text-left">Total</th>
+                <th className="px-4 py-3 text-left">Metode Bayar</th>
+                <th className="px-4 py-3 text-left">Status</th>
+                <th className="px-4 py-3 text-center">Aksi</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {filteredTagihan.map((tagihan) => (
+                <tr key={tagihan.tagihan_id} className="hover:bg-gray-50">
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {tagihan.pasien?.nama_lengkap}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {formatDate(tagihan.tgl_tagihan)}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {formatRupiah(tagihan.biaya_konsultasi)}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {formatRupiah(tagihan.biaya_obat)}
+                  </td>
+                  <td className="px-4 py-3 text-sm font-semibold text-[#0F766E]">
+                    {formatRupiah(tagihan.total_biaya)}
+                  </td>
+                  <td className="px-4 py-3 text-sm text-gray-700">
+                    {tagihan.metode_bayar || '-'}
+                  </td>
                   <td className="px-4 py-3">
-                    <Badge status={tagihan.STATUS_BAYAR} type="payment" />
+                    <Badge status={tagihan.status_bayar} type="payment" />
                   </td>
                   <td className="px-4 py-3 text-center">
-                    {tagihan.STATUS_BAYAR === 'BELUM' && (
+                    {tagihan.status_bayar === 'BELUM' && (
                       <button
-                        onClick={() => handleTandaiLunas(tagihan.TAGIHAN_ID)}
+                        onClick={() => handleTandaiLunas(tagihan.tagihan_id)}
                         className="text-green-600 hover:text-green-800 font-medium text-sm flex items-center gap-1 mx-auto"
                       >
                         <CheckCircle size={16} />
@@ -118,10 +145,10 @@ export function Tagihan() {
                     )}
                   </td>
                 </tr>
-              );
-            })}
-          </tbody>
-        </table>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );

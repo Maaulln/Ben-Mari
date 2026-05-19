@@ -24,7 +24,7 @@ export function PatientAppointment({ pasienId }: PatientAppointmentProps) {
       const data = await getAppointmentPasien(pasienId, status);
 
       const filtered = activeTab === 'riwayat'
-        ? data.filter(a => a.STATUS === 'SELESAI' || a.STATUS === 'BATAL')
+        ? data.filter(a => a.status === 'SELESAI' || a.status === 'BATAL')
         : data;
 
       setAppointments(filtered);
@@ -93,46 +93,46 @@ export function PatientAppointment({ pasienId }: PatientAppointmentProps) {
         ) : (
           <div className="space-y-4">
             {appointments.map((apt) => (
-              <div key={apt.APPOINTMENT_ID} className="bg-white rounded-xl shadow-md p-5 border-l-4 border-[#0F766E]">
+              <div key={apt.appointment_id} className="bg-white rounded-xl shadow-md p-5 border-l-4 border-[#0F766E]">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex-1">
                     <h3 className="font-bold text-gray-900 text-lg">
-                      {apt.dokter?.NAMA_DOKTER}
+                      {apt.dokter?.nama_dokter}
                     </h3>
                     <p className="text-sm text-[#0F766E]">{apt.dokter?.SPESIALISASI}</p>
                   </div>
                   {activeTab === 'mendatang' && (
                     <div className="bg-[#0F766E] text-white px-4 py-2 rounded-lg text-center">
                       <p className="text-xs">No. Antrian</p>
-                      <p className="text-2xl font-bold">{apt.NOMOR_ANTRIAN}</p>
+                      <p className="text-2xl font-bold">{apt.nomor_antrian}</p>
                     </div>
                   )}
                   {activeTab === 'riwayat' && (
-                    <Badge status={apt.STATUS} type="appointment" />
+                    <Badge status={apt.status} type="appointment" />
                   )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 mb-3">
                   <div className="flex items-center gap-2 text-gray-600">
                     <Calendar size={16} />
-                    <span className="text-sm">{formatDate(apt.TGL_APPOINTMENT)}</span>
+                    <span className="text-sm">{formatDate(apt.tgl_appointment)}</span>
                   </div>
                   <div className="flex items-center gap-2 text-gray-600">
                     <Clock size={16} />
-                    <span className="text-sm">{apt.JAM_APPOINTMENT}</span>
+                    <span className="text-sm">{apt.jam_appointment}</span>
                   </div>
                 </div>
 
-                {apt.KELUHAN_AWAL && (
+                {apt.keluhan_awal && (
                   <div className="bg-gray-50 rounded-lg p-3 mb-3">
                     <p className="text-xs text-gray-500 mb-1">Keluhan</p>
-                    <p className="text-sm text-gray-700">{apt.KELUHAN_AWAL}</p>
+                    <p className="text-sm text-gray-700">{apt.keluhan_awal}</p>
                   </div>
                 )}
 
                 {activeTab === 'mendatang' && (
                   <button
-                    onClick={() => handleCancel(apt.APPOINTMENT_ID)}
+                    onClick={() => handleCancel(apt.appointment_id)}
                     className="w-full py-2 border-2 border-red-300 text-red-600 rounded-lg text-sm font-medium hover:bg-red-50 transition-colors flex items-center justify-center gap-2"
                   >
                     <X size={16} />

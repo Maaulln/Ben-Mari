@@ -110,41 +110,41 @@ export function DoctorJadwal({ dokterId, onPeriksaClick, onLihatRekamClick }: Do
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {jadwalList.map((apt) => (
-                  <tr key={apt.APPOINTMENT_ID} className="hover:bg-gray-50 transition-colors">
+                  <tr key={apt.appointment_id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3">
                       <span className="font-mono font-semibold text-[#0F766E]">
-                        #{apt.NOMOR_ANTRIAN}
+                        #{apt.nomor_antrian}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-700">
-                      {apt.pasien?.NAMA_LENGKAP || '-'}
+                      {apt.pasien?.nama_lengkap || '-'}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-700">
-                      {formatDate(apt.TGL_APPOINTMENT)}
+                      {formatDate(apt.tgl_appointment)}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-700 font-mono">
-                      {apt.JAM_APPOINTMENT}
+                      {apt.jam_appointment}
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-700">
-                      {apt.KELUHAN_AWAL || '-'}
+                      {apt.keluhan_awal || '-'}
                     </td>
                     <td className="px-4 py-3">
-                      <Badge status={apt.STATUS} type="appointment" />
+                      <Badge status={apt.status} type="appointment" />
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-center gap-2">
-                        {apt.STATUS === 'MENUNGGU' && (
+                        {apt.status === 'MENUNGGU' && (
                           <button
-                            onClick={() => onPeriksaClick(apt.APPOINTMENT_ID)}
+                            onClick={() => onPeriksaClick(apt.appointment_id)}
                             className="flex items-center gap-1 px-3 py-1.5 bg-[#0F766E] hover:bg-[#0D6B64] text-white rounded-lg text-sm font-medium transition-colors"
                           >
                             <Stethoscope size={14} />
                             Periksa
                           </button>
                         )}
-                        {apt.STATUS === 'SELESAI' && (
+                        {apt.status === 'SELESAI' && (
                           <button
-                            onClick={() => onLihatRekamClick(apt.APPOINTMENT_ID)}
+                            onClick={() => onLihatRekamClick(apt.appointment_id)}
                             className="flex items-center gap-1 px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium transition-colors"
                           >
                             <Eye size={14} />

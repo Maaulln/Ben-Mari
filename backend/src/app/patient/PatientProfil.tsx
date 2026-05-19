@@ -135,11 +135,11 @@ export function PatientProfil({ pasienId, onLogout }: PatientProfilProps) {
         <div className="bg-gradient-to-br from-[#0F766E] to-[#14B8A6] rounded-2xl p-6 mb-6 text-white">
           <div className="flex items-center gap-4">
             <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-3xl font-bold">
-              {(profil.nama_lengkap || profil.nama_lengkap || '?').charAt(0)}
+              {profil.NAMA_LENGKAP.charAt(0)}
             </div>
             <div>
-              <h2 className="text-2xl font-bold">{profil.nama_lengkap}</h2>
-              <p className="opacity-90">NIK: {profil.nik}</p>
+              <h2 className="text-2xl font-bold">{profil.NAMA_LENGKAP}</h2>
+              <p className="opacity-90">NIK: {profil.NIK}</p>
             </div>
           </div>
         </div>
@@ -169,21 +169,21 @@ export function PatientProfil({ pasienId, onLogout }: PatientProfilProps) {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500">Tanggal Lahir</p>
-                <p className="font-medium text-gray-900">{formatDate(profil.tanggal_lahir)}</p>
+                <p className="font-medium text-gray-900">{formatDate(profil.TANGGAL_LAHIR)}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Usia</p>
-                <p className="font-medium text-gray-900">{calculateAge(profil.tanggal_lahir)} tahun</p>
+                <p className="font-medium text-gray-900">{calculateAge(profil.TANGGAL_LAHIR)} tahun</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Jenis Kelamin</p>
                 <p className="font-medium text-gray-900">
-                  {profil.jenis_kelamin === 'L' ? 'Laki-laki' : 'Perempuan'}
+                  {profil.JENIS_KELAMIN === 'L' ? 'Laki-laki' : 'Perempuan'}
                 </p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Golongan Darah</p>
-                <p className="font-medium text-gray-900">{profil.golongan_darah}</p>
+                <p className="font-medium text-gray-900">{profil.GOLONGAN_DARAH}</p>
               </div>
             </div>
           </div>
@@ -193,16 +193,16 @@ export function PatientProfil({ pasienId, onLogout }: PatientProfilProps) {
             <div className="space-y-3">
               <div>
                 <p className="text-sm text-gray-500">Alamat</p>
-                <p className="font-medium text-gray-900">{profil.alamat}</p>
+                <p className="font-medium text-gray-900">{profil.ALAMAT}</p>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-gray-500">No. Telepon</p>
-                  <p className="font-medium text-gray-900">{profil.no_telepon}</p>
+                  <p className="font-medium text-gray-900">{profil.NO_TELEPON}</p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Email</p>
-                  <p className="font-medium text-gray-900">{profil.email}</p>
+                  <p className="font-medium text-gray-900">{profil.EMAIL}</p>
                 </div>
               </div>
             </div>

@@ -123,12 +123,12 @@ export function DoctorProfil({ dokterId }: DoctorProfilProps) {
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
         <div className="flex items-start gap-6">
           <div className="w-24 h-24 bg-[#0F766E] rounded-full flex items-center justify-center text-white text-4xl font-semibold shrink-0">
-            {profil.NAMA_DOKTER.charAt(0)}
+            {profil.nama_dokter.charAt(0)}
           </div>
           <div className="flex-1">
             <div className="flex items-start justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">{profil.NAMA_DOKTER}</h2>
+                <h2 className="text-2xl font-bold text-gray-900">{profil.nama_dokter}</h2>
                 <p className="text-[#0F766E] font-medium mt-1">{profil.SPESIALISASI}</p>
               </div>
               <div className="flex gap-2">
@@ -160,7 +160,7 @@ export function DoctorProfil({ dokterId }: DoctorProfilProps) {
           <div className="space-y-4">
             <div>
               <label className="text-sm text-gray-500">Nama Lengkap</label>
-              <p className="font-medium text-gray-900">{profil.NAMA_DOKTER}</p>
+              <p className="font-medium text-gray-900">{profil.nama_dokter}</p>
             </div>
             <div>
               <label className="text-sm text-gray-500">Spesialisasi</label>
@@ -181,11 +181,11 @@ export function DoctorProfil({ dokterId }: DoctorProfilProps) {
           <div className="space-y-4">
             <div>
               <label className="text-sm text-gray-500">No. Telepon</label>
-              <p className="font-medium text-gray-900">{profil.NO_TELEPON}</p>
+              <p className="font-medium text-gray-900">{profil.no_telepon}</p>
             </div>
             <div>
               <label className="text-sm text-gray-500">Email</label>
-              <p className="font-medium text-gray-900">{profil.EMAIL}</p>
+              <p className="font-medium text-gray-900">{profil.email}</p>
             </div>
           </div>
         </div>

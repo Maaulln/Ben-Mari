@@ -11,6 +11,9 @@ class RekamMedis extends Model
     protected $table = 'rekam_medis';
     protected $primaryKey = 'rekam_id';
 
+    // TAMBAHKAN INI
+    public $timestamps = false;
+
     protected $fillable = [
         'appointment_id',
         'dokter_id',

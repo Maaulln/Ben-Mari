@@ -90,7 +90,7 @@ export function PatientBeranda({ pasienId, pasienNama, onNavigate }: PatientBera
               <div>
                 <p className="text-sm text-gray-500 mb-1">Appointment Terdekat</p>
                 <h3 className="text-xl font-bold text-gray-900">
-                  {appointmentTerdekat.dokter?.NAMA_DOKTER}
+                  {appointmentTerdekat.dokter?.nama_dokter}
                 </h3>
                 <p className="text-sm text-[#0F766E]">
                   {appointmentTerdekat.dokter?.SPESIALISASI}
@@ -99,7 +99,7 @@ export function PatientBeranda({ pasienId, pasienNama, onNavigate }: PatientBera
               <div className="text-right">
                 <div className="bg-[#0F766E] text-white px-4 py-2 rounded-lg">
                   <p className="text-xs">Nomor Antrian</p>
-                  <p className="text-3xl font-bold">{appointmentTerdekat.NOMOR_ANTRIAN}</p>
+                  <p className="text-3xl font-bold">{appointmentTerdekat.nomor_antrian}</p>
                 </div>
               </div>
             </div>
@@ -109,7 +109,7 @@ export function PatientBeranda({ pasienId, pasienNama, onNavigate }: PatientBera
                 <div>
                   <p className="text-xs text-gray-500">Tanggal</p>
                   <p className="text-sm font-medium">
-                    {formatDate(appointmentTerdekat.TGL_APPOINTMENT)}
+                    {formatDate(appointmentTerdekat.tgl_appointment)}
                   </p>
                 </div>
               </div>
@@ -117,7 +117,7 @@ export function PatientBeranda({ pasienId, pasienNama, onNavigate }: PatientBera
                 <Clock size={18} />
                 <div>
                   <p className="text-xs text-gray-500">Jam</p>
-                  <p className="text-sm font-medium">{appointmentTerdekat.JAM_APPOINTMENT}</p>
+                  <p className="text-sm font-medium">{appointmentTerdekat.jam_appointment}</p>
                 </div>
               </div>
             </div>
@@ -196,16 +196,16 @@ export function PatientBeranda({ pasienId, pasienNama, onNavigate }: PatientBera
             <div className="flex gap-4 pb-2">
               {dokterList.slice(0, 5).map((dokter) => (
                 <div
-                  key={dokter.DOKTER_ID}
+                  key={dokter.dokter_id}
                   className="bg-gray-50 rounded-xl p-4 min-w-[280px] hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-start gap-3 mb-3">
                     <div className="w-12 h-12 bg-[#0F766E] rounded-full flex items-center justify-center text-white font-semibold shrink-0">
-                      {dokter.NAMA_DOKTER.charAt(0)}
+                      {dokter.nama_dokter.charAt(0)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-gray-900 truncate">
-                        {dokter.NAMA_DOKTER}
+                        {dokter.nama_dokter}
                       </h3>
                       <p className="text-sm text-[#0F766E]">{dokter.SPESIALISASI}</p>
                     </div>
@@ -225,7 +225,7 @@ export function PatientBeranda({ pasienId, pasienNama, onNavigate }: PatientBera
                   </div>
 
                   <button
-                    onClick={() => onNavigate('buat-appointment', { dokterId: dokter.DOKTER_ID })}
+                    onClick={() => onNavigate('buat-appointment', { dokterId: dokter.dokter_id })}
                     className="w-full py-2 bg-[#0F766E] hover:bg-[#0D6B64] text-white rounded-lg text-sm font-medium transition-colors"
                   >
                     Buat Janji

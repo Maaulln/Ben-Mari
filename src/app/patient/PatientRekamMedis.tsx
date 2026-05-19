@@ -32,7 +32,7 @@ export function PatientRekamMedis({ pasienId }: PatientRekamMedisProps) {
 
   const handleOpenDetail = async (rekam: RekamMedisPasien) => {
     try {
-      const detail = await getRekamMedisDetail(rekam.REKAM_ID);
+      const detail = await getRekamMedisDetail(rekam.rekam_id);
       setSelectedRekam(detail);
       setIsModalOpen(true);
     } catch (error) {
@@ -63,8 +63,8 @@ export function PatientRekamMedis({ pasienId }: PatientRekamMedisProps) {
             <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-200" />
 
             <div className="space-y-6">
-              {rekamList.map((rekam, index) => (
-                <div key={rekam.REKAM_ID} className="relative pl-14">
+              {rekamList.map((rekam) => (
+                <div key={rekam.rekam_id} className="relative pl-14">
                   {/* Timeline Dot */}
                   <div className="absolute left-3 top-3 w-6 h-6 bg-[#0F766E] rounded-full border-4 border-[#F0FDF9]" />
 
@@ -72,21 +72,32 @@ export function PatientRekamMedis({ pasienId }: PatientRekamMedisProps) {
                     <div className="flex items-start justify-between mb-3">
                       <div>
                         <p className="text-sm text-gray-500 mb-1">
-                          {formatDate(rekam.TGL_PERIKSA)}
+                          {formatDate(rekam.tgl_periksa)}
                         </p>
-                        <h3 className="font-bold text-gray-900">{rekam.dokter?.NAMA_DOKTER}</h3>
-                        <p className="text-sm text-[#0F766E]">{rekam.dokter?.SPESIALISASI}</p>
+
+                        <h3 className="font-bold text-gray-900">
+                          {rekam.dokter?.nama_dokter}
+                        </h3>
+
+                        <p className="text-sm text-[#0F766E]">
+                          {rekam.dokter?.spesialisasi}
+                        </p>
                       </div>
                     </div>
 
                     <div className="space-y-2 mb-3">
                       <div>
                         <p className="text-xs text-gray-500">Diagnosis</p>
-                        <p className="font-medium text-gray-900">{rekam.DIAGNOSIS}</p>
+                        <p className="font-medium text-gray-900">
+                          {rekam.diagnosis}
+                        </p>
                       </div>
+
                       <div>
                         <p className="text-xs text-gray-500">Tindakan</p>
-                        <p className="text-sm text-gray-700">{rekam.TINDAKAN}</p>
+                        <p className="text-sm text-gray-700">
+                          {rekam.tindakan}
+                        </p>
                       </div>
                     </div>
 
@@ -115,57 +126,109 @@ export function PatientRekamMedis({ pasienId }: PatientRekamMedisProps) {
         {selectedRekam && (
           <div className="space-y-4">
             <div className="bg-gray-50 rounded-lg p-4">
-              <p className="text-sm text-gray-600 mb-2">Diperiksa oleh</p>
-              <p className="font-semibold text-gray-900">{selectedRekam.dokter?.NAMA_DOKTER}</p>
-              <p className="text-sm text-[#0F766E]">{selectedRekam.dokter?.SPESIALISASI}</p>
-              <p className="text-sm text-gray-500 mt-1">{formatDate(selectedRekam.TGL_PERIKSA)}</p>
+              <p className="text-sm text-gray-600 mb-2">
+                Diperiksa oleh
+              </p>
+
+              <p className="font-semibold text-gray-900">
+                {selectedRekam.dokter?.nama_dokter}
+              </p>
+
+              <p className="text-sm text-[#0F766E]">
+                {selectedRekam.dokter?.spesialisasi}
+              </p>
+
+              <p className="text-sm text-gray-500 mt-1">
+                {formatDate(selectedRekam.tgl_periksa)}
+              </p>
             </div>
 
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-1">Keluhan</p>
-              <p className="text-gray-900">{selectedRekam.KELUHAN}</p>
+              <p className="text-sm font-medium text-gray-700 mb-1">
+                Keluhan
+              </p>
+
+              <p className="text-gray-900">
+                {selectedRekam.keluhan}
+              </p>
             </div>
 
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-1">Diagnosis</p>
-              <p className="text-gray-900 font-semibold">{selectedRekam.DIAGNOSIS}</p>
+              <p className="text-sm font-medium text-gray-700 mb-1">
+                Diagnosis
+              </p>
+
+              <p className="text-gray-900 font-semibold">
+                {selectedRekam.diagnosis}
+              </p>
             </div>
 
             <div>
-              <p className="text-sm font-medium text-gray-700 mb-1">Tindakan</p>
-              <p className="text-gray-900">{selectedRekam.TINDAKAN}</p>
+              <p className="text-sm font-medium text-gray-700 mb-1">
+                Tindakan
+              </p>
+
+              <p className="text-gray-900">
+                {selectedRekam.tindakan}
+              </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-1">Tekanan Darah</p>
-                <p className="text-gray-900">{selectedRekam.TEKANAN_DARAH} mmHg</p>
+                <p className="text-sm font-medium text-gray-700 mb-1">
+                  Tekanan Darah
+                </p>
+
+                <p className="text-gray-900">
+                  {selectedRekam.tekanan_darah} mmHg
+                </p>
               </div>
+
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-1">Berat Badan</p>
-                <p className="text-gray-900">{selectedRekam.BERAT_BADAN} kg</p>
+                <p className="text-sm font-medium text-gray-700 mb-1">
+                  Berat Badan
+                </p>
+
+                <p className="text-gray-900">
+                  {selectedRekam.berat_badan} kg
+                </p>
               </div>
             </div>
 
-            {selectedRekam.CATATAN_TAMBAHAN && (
+            {selectedRekam.catatan_tambahan && (
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-1">Catatan Dokter</p>
-                <p className="text-gray-900">{selectedRekam.CATATAN_TAMBAHAN}</p>
+                <p className="text-sm font-medium text-gray-700 mb-1">
+                  Catatan Dokter
+                </p>
+
+                <p className="text-gray-900">
+                  {selectedRekam.catatan_tambahan}
+                </p>
               </div>
             )}
 
             {selectedRekam.resep && selectedRekam.resep.length > 0 && (
               <div>
-                <p className="text-sm font-medium text-gray-700 mb-2">Obat yang Diresepkan</p>
+                <p className="text-sm font-medium text-gray-700 mb-2">
+                  Obat yang Diresepkan
+                </p>
+
                 <div className="space-y-2">
                   {selectedRekam.resep.map((r, idx) => (
-                    <div key={idx} className="bg-blue-50 rounded-lg p-3">
-                      <p className="font-medium text-gray-900">{r.NAMA_OBAT}</p>
-                      <p className="text-sm text-gray-600">
-                        {r.DOSIS} • {r.ATURAN_PAKAI}
+                    <div
+                      key={idx}
+                      className="bg-blue-50 rounded-lg p-3"
+                    >
+                      <p className="font-medium text-gray-900">
+                        {r.nama_obat}
                       </p>
+
+                      <p className="text-sm text-gray-600">
+                        {r.dosis} • {r.aturan_pakai}
+                      </p>
+
                       <p className="text-sm text-gray-500">
-                        Jumlah: {r.JUMLAH} {r.SATUAN}
+                        Jumlah: {r.jumlah} {r.satuan}
                       </p>
                     </div>
                   ))}

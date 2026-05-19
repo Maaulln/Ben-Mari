@@ -11,29 +11,29 @@ export interface PasienUser {
 }
 
 export interface AppointmentPasien {
-  APPOINTMENT_ID: number;
-  PASIEN_ID: number;
-  DOKTER_ID: number;
-  TGL_APPOINTMENT: string;
-  JAM_APPOINTMENT: string;
-  NOMOR_ANTRIAN: number;
-  KELUHAN_AWAL: string;
-  STATUS: 'MENUNGGU' | 'SELESAI' | 'BATAL';
-  CATATAN: string;
+  appointment_id: number;
+  pasien_id: number;
+  dokter_id: number;
+  tgl_appointment: string;
+  jam_appointment: string;
+  nomor_antrian: number;
+  keluhan_awal: string;
+  status: 'MENUNGGU' | 'SELESAI' | 'BATAL';
+  catatan: string;
   dokter?: {
-    NAMA_DOKTER: string;
-    SPESIALISASI: string;
-    BIAYA_KONSULTASI: number;
+    nama_dokter: string;
+    spesialisasi: string;
+    biaya_konsultasi: number;
   };
 }
 
 export interface DokterPublic {
-  DOKTER_ID: number;
-  NAMA_DOKTER: string;
-  SPESIALISASI: string;
-  JADWAL_PRAKTIK: string;
-  BIAYA_KONSULTASI: number;
-  STATUS_AKTIF: string;
+  dokter_id: number;
+  nama_dokter: string;
+  spesialisasi: string;
+  jadwal_praktik: string;
+  biaya_konsultasi: number;
+  status_aktif: string;
 }
 
 export interface SlotJam {
@@ -42,54 +42,54 @@ export interface SlotJam {
 }
 
 export interface RekamMedisPasien {
-  REKAM_ID: number;
-  TGL_PERIKSA: string;
-  KELUHAN: string;
-  DIAGNOSIS: string;
-  TINDAKAN: string;
-  TEKANAN_DARAH: string;
-  BERAT_BADAN: number;
-  CATATAN_TAMBAHAN: string;
+  rekam_id: number;
+  tgl_periksa: string;
+  keluhan: string;
+  diagnosis: string;
+  tindakan: string;
+  tekanan_darah: string;
+  berat_badan: number;
+  catatan_tambahan: string;
   dokter?: {
-    NAMA_DOKTER: string;
-    SPESIALISASI: string;
+    nama_dokter: string;
+    spesialisasi: string;
   };
   resep?: Array<{
-    NAMA_OBAT: string;
-    DOSIS: string;
-    ATURAN_PAKAI: string;
-    JUMLAH: number;
-    SATUAN: string;
+    nama_obat: string;
+    dosis: string;
+    aturan_pakai: string;
+    jumlah: number;
+    satuan: string;
   }>;
 }
 
 export interface TagihanPasien {
-  TAGIHAN_ID: number;
-  TGL_TAGIHAN: string;
-  BIAYA_KONSULTASI: number;
-  BIAYA_OBAT: number;
-  TOTAL_BIAYA: number;
-  METODE_BAYAR: string;
-  STATUS_BAYAR: 'BELUM' | 'LUNAS' | 'CICIL';
+  tagihan_id: number;
+  tgl_tagihan: string;
+  biaya_konsultasi: number;
+  biaya_obat: number;
+  total_biaya: number;
+  metode_bayar: string;
+  status_bayar: 'BELUM' | 'LUNAS' | 'CICIL';
   appointment?: {
-    TGL_APPOINTMENT: string;
+    tgl_appointment: string;
     dokter?: {
-      NAMA_DOKTER: string;
+      nama_dokter: string;
     };
   };
 }
 
 export interface ProfilPasien {
-  PASIEN_ID: number;
+  pasien_id: number;
   NIK: string;
-  NAMA_LENGKAP: string;
-  TANGGAL_LAHIR: string;
-  JENIS_KELAMIN: 'L' | 'P';
+  nama_lengkap: string;
+  tanggal_lahir: string;
+  jenis_kelamin: 'L' | 'P';
   ALAMAT: string;
-  NO_TELEPON: string;
+  no_telepon: string;
   EMAIL: string;
-  GOLONGAN_DARAH: string;
-  STATUS_AKTIF: string;
+  golongan_darah: string;
+  status_aktif: string;
 }
 
 export interface CreateAppointmentRequest {
@@ -102,7 +102,7 @@ export interface CreateAppointmentRequest {
 
 export interface UpdateProfilPasienRequest {
   ALAMAT: string;
-  NO_TELEPON: string;
+  no_telepon: string;
   EMAIL: string;
 }
 
@@ -114,12 +114,12 @@ export interface ChangePasswordPasienRequest {
 
 export interface RegisterPasienRequest {
   NIK: string;
-  NAMA_LENGKAP: string;
-  TANGGAL_LAHIR: string;
-  JENIS_KELAMIN: 'L' | 'P';
-  GOLONGAN_DARAH: string;
+  nama_lengkap: string;
+  tanggal_lahir: string;
+  jenis_kelamin: 'L' | 'P';
+  golongan_darah: string;
   ALAMAT: string;
-  NO_TELEPON: string;
+  no_telepon: string;
   EMAIL: string;
   password: string;
   konfirmasiPassword: string;
@@ -161,7 +161,7 @@ export const createAppointment = async (
 
 export const cancelAppointment = async (appointmentId: number): Promise<void> => {
   await api.put(`/appointment/${appointmentId}`, {
-    STATUS: 'BATAL',
+    status: 'BATAL',
   });
 };
 

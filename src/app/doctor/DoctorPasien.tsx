@@ -36,7 +36,7 @@ export function DoctorPasien({ dokterId }: DoctorPasienProps) {
     setSelectedPasien(pasien);
     setLoadingRiwayat(true);
     try {
-      const data = await getRiwayatPasien(dokterId, pasien.PASIEN_ID);
+      const data = await getRiwayatPasien(dokterId, pasien.pasien_id);
       setRiwayat(data);
     } catch (error) {
       console.error('Error loading riwayat:', error);
@@ -75,10 +75,10 @@ export function DoctorPasien({ dokterId }: DoctorPasienProps) {
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6 mb-6">
           <div className="flex items-start gap-4">
             <div className="w-16 h-16 bg-[#0F766E] rounded-full flex items-center justify-center text-white text-2xl font-semibold">
-              {selectedPasien.NAMA_LENGKAP.charAt(0)}
+              {selectedPasien.nama_lengkap.charAt(0)}
             </div>
             <div className="flex-1">
-              <h2 className="text-xl font-bold text-gray-900">{selectedPasien.NAMA_LENGKAP}</h2>
+              <h2 className="text-xl font-bold text-gray-900">{selectedPasien.nama_lengkap}</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-3 text-sm">
                 <div>
                   <span className="text-gray-500">Usia:</span>
@@ -123,18 +123,18 @@ export function DoctorPasien({ dokterId }: DoctorPasienProps) {
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {riwayat.map((r) => (
-                    <tr key={r.APPOINTMENT_ID} className="hover:bg-gray-50">
+                    <tr key={r.appointment_id} className="hover:bg-gray-50">
                       <td className="px-4 py-3 text-sm text-gray-700">
-                        {formatDate(r.TGL_APPOINTMENT)}
+                        {formatDate(r.tgl_appointment)}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-700 font-mono">
-                        {r.JAM_APPOINTMENT}
+                        {r.jam_appointment}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-700">
-                        {r.KELUHAN_AWAL || '-'}
+                        {r.keluhan_awal || '-'}
                       </td>
                       <td className="px-4 py-3">
-                        <Badge status={r.STATUS} type="appointment" />
+                        <Badge status={r.status} type="appointment" />
                       </td>
                     </tr>
                   ))}
@@ -166,17 +166,17 @@ export function DoctorPasien({ dokterId }: DoctorPasienProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {pasienList.map((pasien) => (
             <button
-              key={pasien.PASIEN_ID}
+              key={pasien.pasien_id}
               onClick={() => handlePasienClick(pasien)}
               className="bg-white rounded-xl border border-gray-100 shadow-sm p-5 hover:shadow-md hover:border-[#0F766E] transition-all text-left"
             >
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-[#0F766E] rounded-full flex items-center justify-center text-white font-semibold shrink-0">
-                  {pasien.NAMA_LENGKAP.charAt(0)}
+                  {pasien.nama_lengkap.charAt(0)}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-gray-900 truncate">
-                    {pasien.NAMA_LENGKAP}
+                    {pasien.nama_lengkap}
                   </h3>
                   <div className="grid grid-cols-2 gap-2 mt-2 text-sm">
                     <div>

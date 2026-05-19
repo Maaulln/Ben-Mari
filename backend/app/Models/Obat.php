@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Obat extends Model
 {
     protected $table = 'obat';
+    public $timestamps = false;
     protected $primaryKey = 'obat_id';
 
     protected $fillable = [

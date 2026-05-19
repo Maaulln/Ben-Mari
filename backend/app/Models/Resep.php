@@ -8,7 +8,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Resep extends Model
 {
     protected $table = 'resep';
+
     protected $primaryKey = 'resep_id';
+
+    // FIX ORACLE TIMESTAMP
+    public $timestamps = false;
 
     protected $fillable = [
         'rekam_id',
@@ -22,11 +26,19 @@ class Resep extends Model
 
     public function rekamMedis(): BelongsTo
     {
-        return $this->belongsTo(RekamMedis::class, 'rekam_id', 'rekam_id');
+        return $this->belongsTo(
+            RekamMedis::class,
+            'rekam_id',
+            'rekam_id'
+        );
     }
 
     public function obat(): BelongsTo
     {
-        return $this->belongsTo(Obat::class, 'obat_id', 'obat_id');
+        return $this->belongsTo(
+            Obat::class,
+            'obat_id',
+            'obat_id'
+        );
     }
 }

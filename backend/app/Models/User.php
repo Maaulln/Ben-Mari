@@ -10,6 +10,8 @@ class User extends Authenticatable
 {
     use HasApiTokens, Notifiable;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'nama',
         'email',

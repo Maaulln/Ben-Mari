@@ -15,132 +15,213 @@ export interface DashboardStats {
 }
 
 export interface AppointmentDokter {
-  APPOINTMENT_ID: number;
-  PASIEN_ID: number;
-  DOKTER_ID: number;
-  TGL_APPOINTMENT: string;
-  JAM_APPOINTMENT: string;
-  NOMOR_ANTRIAN: number;
-  KELUHAN_AWAL: string;
-  STATUS: 'MENUNGGU' | 'SELESAI' | 'BATAL';
-  CATATAN: string;
+  appointment_id: number;
+  pasien_id: number;
+  dokter_id: number;
+
+  tgl_appointment: string;
+  jam_appointment: string;
+
+  nomor_antrian: number;
+
+  keluhan_awal: string;
+
+  status:
+    | 'MENUNGGU'
+    | 'SELESAI'
+    | 'BATAL';
+
+  catatan: string;
+
   pasien?: {
-    NAMA_LENGKAP: string;
-    TANGGAL_LAHIR: string;
-    GOLONGAN_DARAH: string;
+    nama_lengkap: string;
+    tanggal_lahir: string;
+    golongan_darah: string;
   };
 }
 
 export interface PasienDokter {
-  PASIEN_ID: number;
-  NIK: string;
-  NAMA_LENGKAP: string;
-  TANGGAL_LAHIR: string;
-  JENIS_KELAMIN: 'L' | 'P';
-  ALAMAT: string;
-  NO_TELEPON: string;
-  EMAIL: string;
-  GOLONGAN_DARAH: string;
+  pasien_id: number;
+
+  nik: string;
+  nama_lengkap: string;
+
+  tanggal_lahir: string;
+
+  jenis_kelamin:
+    | 'L'
+    | 'P';
+
+  alamat: string;
+  no_telepon: string;
+  email: string;
+
+  golongan_darah: string;
+
   jumlahKunjungan: number;
 }
 
+// =========================
+// FIX INTERFACE LOWERCASE
+// =========================
 export interface RekamMedisDokter {
-  REKAM_ID: number;
-  APPOINTMENT_ID: number;
-  DOKTER_ID: number;
-  TGL_PERIKSA: string;
-  KELUHAN: string;
-  DIAGNOSIS: string;
-  TINDAKAN: string;
-  TEKANAN_DARAH: string;
-  BERAT_BADAN: number;
-  CATATAN_TAMBAHAN: string;
-  pasien?: {
-    NAMA_LENGKAP: string;
+  rekam_id: number;
+
+  appointment_id: number;
+  dokter_id: number;
+
+  tgl_periksa: string;
+
+  keluhan: string;
+  diagnosis: string;
+  tindakan: string;
+
+  tekanan_darah: string;
+  berat_badan: number;
+
+  catatan_tambahan: string;
+
+  appointment?: {
+    pasien?: {
+      nama_lengkap: string;
+    };
   };
+
   resep?: any[];
 }
 
 export interface CreateRekamMedisRequest {
-  APPOINTMENT_ID: number;
-  KELUHAN: string;
-  DIAGNOSIS: string;
-  TINDAKAN: string;
-  TEKANAN_DARAH: string;
-  BERAT_BADAN: number;
-  CATATAN_TAMBAHAN: string;
+  appointment_id: number;
+
+  dokter_id?: number;
+
+  tgl_periksa?: string;
+
+  keluhan: string;
+  diagnosis: string;
+  tindakan: string;
+
+  tekanan_darah: string;
+  berat_badan: number;
+
+  catatan_tambahan: string;
 }
 
+// =========================
+// FIX CREATE RESEP
+// =========================
 export interface CreateResepRequest {
-  REKAM_ID: number;
-  OBAT_ID: number;
-  DOSIS: string;
-  ATURAN_PAKAI: string;
-  JUMLAH: number;
-  CATATAN_RESEP: string;
+  rekam_id: number;
+  obat_id: number;
+  dosis: string;
+  aturan_pakai: string;
+  jumlah: number;
+  catatan_resep: string;
 }
 
 export interface ProfilDokter {
-  DOKTER_ID: number;
-  NAMA_DOKTER: string;
-  SPESIALISASI: string;
-  NO_SIP: string;
-  NO_TELEPON: string;
-  EMAIL: string;
-  JADWAL_PRAKTIK: string;
-  BIAYA_KONSULTASI: number;
-  STATUS_AKTIF: string;
+  dokter_id: number;
+
+  nama_dokter: string;
+
+  spesialisasi: string;
+
+  no_sip: string;
+
+  no_telepon: string;
+
+  email: string;
+
+  jadwal_praktik: string;
+
+  biaya_konsultasi: number;
+
+  status_aktif: string;
 }
 
 export interface UpdateProfilRequest {
-  NO_TELEPON: string;
-  EMAIL: string;
-  JADWAL_PRAKTIK: string;
-  BIAYA_KONSULTASI: number;
+  no_telepon: string;
+
+  email: string;
+
+  jadwal_praktik: string;
+
+  biaya_konsultasi: number;
 }
 
 export interface ChangePasswordRequest {
   passwordLama: string;
+
   passwordBaru: string;
+
   konfirmasiPassword: string;
 }
 
-// Dashboard
-export const getDashboardStats = async (dokterId: number): Promise<DashboardStats> => {
-  const response = await api.get(`/dokter/${dokterId}/dashboard/stats`);
+// =========================
+// DASHBOARD
+// =========================
+export const getDashboardStats = async (
+  dokterId: number
+): Promise<DashboardStats> => {
+  const response = await api.get(
+    `/dokter/${dokterId}/dashboard/stats`
+  );
+
   return response.data;
 };
 
-export const getJadwalHariIni = async (dokterId: number): Promise<AppointmentDokter[]> => {
-  const today = new Date().toISOString().split('T')[0];
-  const response = await api.get(`/appointment`, {
-    params: {
-      dokter_id: dokterId,
-      tanggal: today,
-    },
-  });
+export const getJadwalHariIni = async (
+  dokterId: number
+): Promise<AppointmentDokter[]> => {
+  const today = new Date()
+    .toISOString()
+    .split('T')[0];
+
+  const response = await api.get(
+    `/appointment`,
+    {
+      params: {
+        dokter_id: dokterId,
+        tanggal: today,
+      },
+    }
+  );
+
   return response.data;
 };
 
-// Jadwal
+// =========================
+// JADWAL
+// =========================
 export const getJadwalDokter = async (
   dokterId: number,
   tanggal?: string,
   status?: string
 ): Promise<AppointmentDokter[]> => {
-  const response = await api.get(`/appointment`, {
-    params: {
-      dokter_id: dokterId,
-      tanggal: tanggal || '',
-      status: status || '',
-    },
-  });
+  const response = await api.get(
+    `/appointment`,
+    {
+      params: {
+        dokter_id: dokterId,
+        tanggal: tanggal || '',
+        status: status || '',
+      },
+    }
+  );
+
   return response.data;
 };
 
-// Pasien
-export const getPasienDokter = async (dokterId: number): Promise<PasienDokter[]> => {
-  const response = await api.get(`/dokter/${dokterId}/pasien`);
+// =========================
+// PASIEN
+// =========================
+export const getPasienDokter = async (
+  dokterId: number
+): Promise<PasienDokter[]> => {
+  const response = await api.get(
+    `/dokter/${dokterId}/pasien`
+  );
+
   return response.data;
 };
 
@@ -148,55 +229,152 @@ export const getRiwayatPasien = async (
   dokterId: number,
   pasienId: number
 ): Promise<AppointmentDokter[]> => {
-  const response = await api.get(`/dokter/${dokterId}/pasien/${pasienId}/riwayat`);
+  const response = await api.get(
+    `/dokter/${dokterId}/pasien/${pasienId}/riwayat`
+  );
+
   return response.data;
 };
 
-// Rekam Medis
-export const getRekamMedisDokter = async (dokterId: number): Promise<RekamMedisDokter[]> => {
-  const response = await api.get(`/rekam-medis`, {
-    params: {
-      dokter_id: dokterId,
-    },
-  });
+// =========================
+// REKAM MEDIS
+// =========================
+export const getRekamMedisDokter = async (
+  dokterId: number
+): Promise<RekamMedisDokter[]> => {
+  const response = await api.get(
+    `/rekam-medis`,
+    {
+      params: {
+        dokter_id: dokterId,
+      },
+    }
+  );
+
   return response.data;
 };
 
-export const getRekamMedisDetail = async (rekamId: number): Promise<RekamMedisDokter> => {
-  const response = await api.get(`/rekam-medis/${rekamId}`);
+export const getRekamMedisDetail = async (
+  rekamId: number
+): Promise<RekamMedisDokter> => {
+  const response = await api.get(
+    `/rekam-medis/${rekamId}`
+  );
+
   return response.data;
 };
 
 export const createRekamMedis = async (
   data: CreateRekamMedisRequest
 ): Promise<RekamMedisDokter> => {
-  const response = await api.post(`/rekam-medis`, data);
+  const payload = {
+    appointment_id:
+      data.appointment_id,
+
+    dokter_id:
+      data.dokter_id,
+
+    tgl_periksa:
+      data.tgl_periksa ||
+      new Date()
+        .toISOString()
+        .split('T')[0],
+
+    keluhan:
+      data.keluhan,
+
+    diagnosis:
+      data.diagnosis,
+
+    tindakan:
+      data.tindakan,
+
+    tekanan_darah:
+      data.tekanan_darah,
+
+    berat_badan:
+      data.berat_badan,
+
+    catatan_tambahan:
+      data.catatan_tambahan,
+  };
+
+  const response = await api.post(
+    `/rekam-medis`,
+    payload
+  );
+
   return response.data;
 };
 
-export const createResep = async (data: CreateResepRequest): Promise<any> => {
-  const response = await api.post(`/resep`, data);
+// =========================
+// FIX CREATE RESEP LOWERCASE
+// =========================
+export const createResep = async (
+  data: CreateResepRequest
+): Promise<any> => {
+  const payload = {
+    rekam_id:
+      data.rekam_id,
+
+    obat_id:
+      data.obat_id,
+
+    dosis:
+      data.dosis,
+
+    aturan_pakai:
+      data.aturan_pakai,
+
+    jumlah:
+      data.jumlah,
+
+    catatan_resep:
+      data.catatan_resep,
+  };
+
+  const response = await api.post(
+    `/resep`,
+    payload
+  );
+
   return response.data;
 };
 
-export const getAppointmentMenunggu = async (dokterId: number): Promise<AppointmentDokter[]> => {
-  const response = await api.get(`/appointment`, {
-    params: {
-      dokter_id: dokterId,
-      status: 'MENUNGGU',
-    },
-  });
+export const getAppointmentMenunggu = async (
+  dokterId: number
+): Promise<AppointmentDokter[]> => {
+  const response = await api.get(
+    `/appointment`,
+    {
+      params: {
+        dokter_id: dokterId,
+        status: 'MENUNGGU',
+      },
+    }
+  );
+
   return response.data;
 };
 
 export const getObatList = async (): Promise<any[]> => {
-  const response = await api.get(`/obat`);
+  const response = await api.get(
+    `/obat`
+  );
+
   return response.data;
 };
 
-// Profil
-export const getProfilDokter = async (dokterId: number): Promise<ProfilDokter> => {
-  const response = await api.get(`/dokter/${dokterId}`);
+// =========================
+// PROFIL
+// =========================
+export const getProfilDokter = async (
+  dokterId: number
+): Promise<ProfilDokter> => {
+  const response = await api.get(
+    `/dokter/${dokterId}`
+  );
+
   return response.data;
 };
 
@@ -204,7 +382,11 @@ export const updateProfilDokter = async (
   dokterId: number,
   data: UpdateProfilRequest
 ): Promise<ProfilDokter> => {
-  const response = await api.put(`/dokter/${dokterId}`, data);
+  const response = await api.put(
+    `/dokter/${dokterId}`,
+    data
+  );
+
   return response.data;
 };
 
@@ -212,6 +394,10 @@ export const changePassword = async (
   dokterId: number,
   data: ChangePasswordRequest
 ): Promise<any> => {
-  const response = await api.post(`/dokter/${dokterId}/change-password`, data);
+  const response = await api.post(
+    `/dokter/${dokterId}/change-password`,
+    data
+  );
+
   return response.data;
 };
