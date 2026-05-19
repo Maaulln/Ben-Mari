@@ -28,6 +28,7 @@ export function PatientBuatAppointment({
   const [selectedDokter, setSelectedDokter] = useState<DokterPublic | null>(null);
   const [selectedTanggal, setSelectedTanggal] = useState('');
   const [selectedJam, setSelectedJam] = useState('');
+  const [selectedSesiId, setSelectedSesiId] = useState<number | null>(null);
   const [slotJam, setSlotJam] = useState<SlotJam[]>([]);
   const [keluhan, setKeluhan] = useState('');
   const [loading, setLoading] = useState(false);
@@ -74,7 +75,7 @@ export function PatientBuatAppointment({
   };
 
   const handleSubmit = async () => {
-    if (!selectedDokter || !selectedTanggal || !selectedJam) return;
+    if (!selectedDokter || !selectedTanggal || !selectedSesiId) return;
 
     try {
       setLoading(true);
@@ -83,6 +84,7 @@ export function PatientBuatAppointment({
         dokter_id: selectedDokter.dokter_id,
         tgl_appointment: selectedTanggal,
         jam_appointment: selectedJam,
+        sesi_id: selectedSesiId ?? undefined,
         keluhan_awal: keluhan,
       });
 
@@ -96,9 +98,9 @@ export function PatientBuatAppointment({
     }
   };
 
-  const spesialisasiList = Array.from(new Set(dokterList.map((d) => d.SPESIALISASI)));
+  const spesialisasiList = Array.from(new Set(dokterList.map((d) => d.spesialisasi)));
   const filteredDokter = filterSpesialisasi
-    ? dokterList.filter((d) => d.SPESIALISASI === filterSpesialisasi)
+    ? dokterList.filter((d) => d.spesialisasi === filterSpesialisasi)
     : dokterList;
 
   // Success Screen
@@ -215,18 +217,18 @@ export function PatientBuatAppointment({
                     </div>
                     <div className="flex-1">
                       <h3 className="font-semibold text-gray-900">{dokter.nama_dokter}</h3>
-                      <p className="text-sm text-[#0F766E]">{dokter.SPESIALISASI}</p>
+                      <p className="text-sm text-[#0F766E]">{dokter.spesialisasi}</p>
                     </div>
                   </div>
 
                   <div className="space-y-2 text-sm text-gray-600">
                     <div className="flex items-center gap-2">
                       <Clock size={14} />
-                      <span className="text-xs">{dokter.JADWAL_PRAKTIK}</span>
+                      <span className="text-xs">{dokter.jadwal_praktik}</span>
                     </div>
                     <div>
                       <span className="font-semibold text-[#0F766E]">
-                        {formatRupiah(dokter.BIAYA_KONSULTASI)}
+                        {formatRupiah(dokter.biaya_konsultasi)}
                       </span>
                     </div>
                   </div>
@@ -244,7 +246,7 @@ export function PatientBuatAppointment({
             <div className="bg-white rounded-xl p-4 mb-6">
               <p className="text-sm text-gray-600 mb-1">Dokter yang dipilih:</p>
               <p className="font-semibold text-gray-900">{selectedDokter.nama_dokter}</p>
-              <p className="text-sm text-[#0F766E]">{selectedDokter.SPESIALISASI}</p>
+              <p className="text-sm text-[#0F766E]">{selectedDokter.spesialisasi}</p>
             </div>
 
             <div className="mb-6">
@@ -257,6 +259,7 @@ export function PatientBuatAppointment({
                 onChange={(e) => {
                   setSelectedTanggal(e.target.value);
                   setSelectedJam('');
+                  setSelectedSesiId(null);
                 }}
                 min={new Date().toISOString().split('T')[0]}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
@@ -268,27 +271,37 @@ export function PatientBuatAppointment({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Pilih Jam
                 </label>
-                <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
-                  {slotJam.map((slot) => (
-                    <button
-                      key={slot.jam}
-                      onClick={() => slot.tersedia && setSelectedJam(slot.jam)}
-                      disabled={!slot.tersedia}
-                      className={`py-3 px-4 rounded-lg font-medium transition-colors ${
-                        selectedJam === slot.jam
-                          ? 'bg-[#0F766E] text-white'
-                          : slot.tersedia
-                          ? 'bg-white border-2 border-gray-300 text-gray-700 hover:border-[#0F766E]'
-                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                      }`}
-                    >
-                      {slot.jam}
-                      {!slot.tersedia && (
-                        <span className="block text-xs mt-1">Penuh</span>
-                      )}
-                    </button>
-                  ))}
-                </div>
+                {slotJam.length === 0 ? (
+                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 text-sm text-yellow-700">
+                    Tidak ada jam praktik tersedia pada tanggal ini. Silakan pilih tanggal lain.
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-3 md:grid-cols-4 gap-3">
+                    {slotJam.map((slot, idx) => (
+                      <button
+                        key={`${slot.sesi_id}-${slot.jam}-${idx}`}
+                        onClick={() => {
+                          if (!slot.tersedia) return;
+                          setSelectedJam(slot.jam);
+                          setSelectedSesiId(slot.sesi_id);
+                        }}
+                        disabled={!slot.tersedia}
+                        className={`py-3 px-4 rounded-lg font-medium transition-colors ${
+                          selectedJam === slot.jam && selectedSesiId === slot.sesi_id
+                            ? 'bg-[#0F766E] text-white'
+                            : slot.tersedia
+                            ? 'bg-white border-2 border-gray-300 text-gray-700 hover:border-[#0F766E]'
+                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        }`}
+                      >
+                        {slot.jam}
+                        {!slot.tersedia && (
+                          <span className="block text-xs mt-1">Penuh</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
 
@@ -301,7 +314,7 @@ export function PatientBuatAppointment({
               </button>
               <button
                 onClick={() => setStep(3)}
-                disabled={!selectedTanggal || !selectedJam}
+                disabled={!selectedTanggal || !selectedSesiId}
                 className="flex-1 py-3 bg-[#0F766E] hover:bg-[#0D6B64] text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Lanjutkan
@@ -321,7 +334,7 @@ export function PatientBuatAppointment({
                 <div>
                   <p className="text-sm text-gray-600">Dokter</p>
                   <p className="font-medium text-gray-900">{selectedDokter.nama_dokter}</p>
-                  <p className="text-sm text-[#0F766E]">{selectedDokter.SPESIALISASI}</p>
+                  <p className="text-sm text-[#0F766E]">{selectedDokter.spesialisasi}</p>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -336,7 +349,7 @@ export function PatientBuatAppointment({
                 <div>
                   <p className="text-sm text-gray-600">Perkiraan Biaya Konsultasi</p>
                   <p className="text-xl font-bold text-[#0F766E]">
-                    {formatRupiah(selectedDokter.BIAYA_KONSULTASI)}
+                    {formatRupiah(selectedDokter.biaya_konsultasi)}
                   </p>
                 </div>
               </div>

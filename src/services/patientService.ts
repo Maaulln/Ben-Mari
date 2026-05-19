@@ -37,6 +37,8 @@ export interface DokterPublic {
 }
 
 export interface SlotJam {
+  sesi_id: number;
+  sesi: 'PAGI' | 'SIANG' | 'SORE' | 'MALAM';
   jam: string;
   tersedia: boolean;
 }
@@ -97,6 +99,7 @@ export interface CreateAppointmentRequest {
   dokter_id: number;
   tgl_appointment: string;
   jam_appointment: string;
+  sesi_id?: number;
   keluhan_awal: string;
 }
 

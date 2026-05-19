@@ -20,10 +20,10 @@ export function DoctorProfil({ dokterId }: DoctorProfilProps) {
   const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   const [editData, setEditData] = useState({
-    NO_TELEPON: '',
-    EMAIL: '',
-    JADWAL_PRAKTIK: '',
-    BIAYA_KONSULTASI: 0,
+    no_telepon: '',
+    email: '',
+    jadwal_praktik: '',
+    biaya_konsultasi: 0,
   });
 
   const [passwordData, setPasswordData] = useState({
@@ -42,10 +42,10 @@ export function DoctorProfil({ dokterId }: DoctorProfilProps) {
       const data = await getProfilDokter(dokterId);
       setProfil(data);
       setEditData({
-        NO_TELEPON: data.NO_TELEPON,
-        EMAIL: data.EMAIL,
-        JADWAL_PRAKTIK: data.JADWAL_PRAKTIK,
-        BIAYA_KONSULTASI: data.BIAYA_KONSULTASI,
+        no_telepon: data.no_telepon,
+        email: data.email,
+        jadwal_praktik: data.jadwal_praktik,
+        biaya_konsultasi: data.biaya_konsultasi,
       });
     } catch (error) {
       console.error('Error loading profil:', error);
@@ -129,7 +129,7 @@ export function DoctorProfil({ dokterId }: DoctorProfilProps) {
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">{profil.nama_dokter}</h2>
-                <p className="text-[#0F766E] font-medium mt-1">{profil.SPESIALISASI}</p>
+                <p className="text-[#0F766E] font-medium mt-1">{profil.spesialisasi}</p>
               </div>
               <div className="flex gap-2">
                 <button
@@ -164,12 +164,12 @@ export function DoctorProfil({ dokterId }: DoctorProfilProps) {
             </div>
             <div>
               <label className="text-sm text-gray-500">Spesialisasi</label>
-              <p className="font-medium text-gray-900">{profil.SPESIALISASI}</p>
+              <p className="font-medium text-gray-900">{profil.spesialisasi}</p>
               <p className="text-xs text-gray-400 mt-1">*Hanya bisa diubah oleh admin</p>
             </div>
             <div>
               <label className="text-sm text-gray-500">No. SIP</label>
-              <p className="font-medium text-gray-900 font-mono">{profil.NO_SIP}</p>
+              <p className="font-medium text-gray-900 font-mono">{profil.no_sip}</p>
               <p className="text-xs text-gray-400 mt-1">*Hanya bisa diubah oleh admin</p>
             </div>
           </div>
@@ -193,14 +193,14 @@ export function DoctorProfil({ dokterId }: DoctorProfilProps) {
         {/* Praktik */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
           <h3 className="font-semibold text-gray-900 mb-4">Jadwal Praktik</h3>
-          <p className="text-gray-700">{profil.JADWAL_PRAKTIK}</p>
+          <p className="text-gray-700">{profil.jadwal_praktik}</p>
         </div>
 
         {/* Tarif */}
         <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-6">
           <h3 className="font-semibold text-gray-900 mb-4">Biaya Konsultasi</h3>
           <p className="text-2xl font-bold text-[#0F766E]">
-            {formatRupiah(profil.BIAYA_KONSULTASI)}
+            {formatRupiah(profil.biaya_konsultasi)}
           </p>
           <p className="text-sm text-gray-500 mt-1">per kunjungan</p>
         </div>
@@ -224,8 +224,8 @@ export function DoctorProfil({ dokterId }: DoctorProfilProps) {
             </label>
             <input
               type="text"
-              value={editData.NO_TELEPON}
-              onChange={(e) => setEditData({ ...editData, NO_TELEPON: e.target.value })}
+              value={editData.no_telepon}
+              onChange={(e) => setEditData({ ...editData, no_telepon: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
               required
             />
@@ -237,8 +237,8 @@ export function DoctorProfil({ dokterId }: DoctorProfilProps) {
             </label>
             <input
               type="email"
-              value={editData.EMAIL}
-              onChange={(e) => setEditData({ ...editData, EMAIL: e.target.value })}
+              value={editData.email}
+              onChange={(e) => setEditData({ ...editData, email: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
               required
             />
@@ -249,8 +249,8 @@ export function DoctorProfil({ dokterId }: DoctorProfilProps) {
               Jadwal Praktik <span className="text-red-500">*</span>
             </label>
             <textarea
-              value={editData.JADWAL_PRAKTIK}
-              onChange={(e) => setEditData({ ...editData, JADWAL_PRAKTIK: e.target.value })}
+              value={editData.jadwal_praktik}
+              onChange={(e) => setEditData({ ...editData, jadwal_praktik: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
               rows={2}
               placeholder="Contoh: Senin-Jumat 08:00-14:00"
@@ -264,8 +264,8 @@ export function DoctorProfil({ dokterId }: DoctorProfilProps) {
             </label>
             <input
               type="number"
-              value={editData.BIAYA_KONSULTASI}
-              onChange={(e) => setEditData({ ...editData, BIAYA_KONSULTASI: Number(e.target.value) })}
+              value={editData.biaya_konsultasi}
+              onChange={(e) => setEditData({ ...editData, biaya_konsultasi: Number(e.target.value) })}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
               min="0"
               required

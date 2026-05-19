@@ -7,6 +7,7 @@ use App\Models\Dokter;
 use App\Models\Appointment;
 use App\Models\Pasien;
 use App\Models\RekamMedis;
+use App\Models\SesiPraktik;
 use Illuminate\Http\Request;
 
 class DokterController extends Controller
@@ -62,13 +63,13 @@ class DokterController extends Controller
         $dokter = Dokter::findOrFail($id);
 
         $validated = $request->validate([
-            'nama_dokter'       => 'required',
-            'spesialisasi'      => 'required',
-            'no_sip'            => 'required|unique:dokter,no_sip,' . $id . ',dokter_id',
-            'no_telepon'        => 'required',
-            'email'             => 'nullable|email|unique:dokter,email,' . $id . ',dokter_id',
+            'nama_dokter'       => 'sometimes|required',
+            'spesialisasi'      => 'sometimes|required',
+            'no_sip'            => 'sometimes|required|unique:dokter,no_sip,' . $id . ',dokter_id',
+            'no_telepon'        => 'sometimes|required',
+            'email'             => 'sometimes|nullable|email|unique:dokter,email,' . $id . ',dokter_id',
             'jadwal_praktik'    => 'nullable',
-            'biaya_konsultasi'  => 'required|numeric',
+            'biaya_konsultasi'  => 'sometimes|required|numeric',
             'status_aktif'      => 'nullable|in:Y,N',
         ]);
 
@@ -88,55 +89,39 @@ class DokterController extends Controller
         ]);
     }
 
-    // Slot jam dokter
+    // Slot jam dokter — generate dari jam sesi_praktik yang admin set
     public function slotJam($dokterId, Request $request)
     {
-        $tanggal = $request->query(
-            'tanggal',
-            now()->toDateString()
-        );
+        $tanggal = $request->query('tanggal', now()->toDateString());
 
-        $jamTersedia = [
-            '08:00',
-            '09:00',
-            '10:00',
-            '11:00',
-            '13:00',
-            '14:00',
-            '15:00',
-            '16:00'
-        ];
+        $sesiList = SesiPraktik::where('dokter_id', $dokterId)
+            ->whereDate('tanggal', $tanggal)
+            ->whereIn('status', ['BUKA', 'PENUH'])
+            ->orderBy('jam_mulai')
+            ->get();
 
-        $jamTerpakai = Appointment::where(
-            'dokter_id',
-            $dokterId
-        )
-            ->whereDate(
-                'tgl_appointment',
-                $tanggal
-            )
-            ->where(
-                'status',
-                '!=',
-                'BATAL'
-            )
-            ->pluck('jam_appointment')
-            ->toArray();
+        if ($sesiList->isEmpty()) {
+            return response()->json([]);
+        }
 
-        $slots = array_map(
-            function ($jam) use (
-                $jamTerpakai
-            ) {
-                return [
-                    'jam'       => $jam,
-                    'tersedia'  => !in_array(
-                        $jam,
-                        $jamTerpakai
-                    )
+        $slots = [];
+
+        foreach ($sesiList as $sesi) {
+            $mulai    = \Carbon\Carbon::createFromFormat('H:i:s', $sesi->jam_mulai);
+            $selesai  = \Carbon\Carbon::createFromFormat('H:i:s', $sesi->jam_selesai);
+            $tersedia = $sesi->status === 'BUKA' && $sesi->terisi < $sesi->kuota;
+
+            $current = $mulai->copy();
+            while ($current < $selesai) {
+                $slots[] = [
+                    'sesi_id'  => $sesi->sesi_id,
+                    'sesi'     => $sesi->sesi,
+                    'jam'      => $current->format('H:i'),
+                    'tersedia' => $tersedia,
                 ];
-            },
-            $jamTersedia
-        );
+                $current->addHour();
+            }
+        }
 
         return response()->json($slots);
     }
