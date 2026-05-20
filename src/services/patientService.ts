@@ -128,15 +128,14 @@ export interface ChangePasswordPasienRequest {
 
 export interface RegisterPasienRequest {
   NIK: string;
-  nama_lengkap: string;
-  tanggal_lahir: string;
-  jenis_kelamin: 'L' | 'P';
-  golongan_darah: string;
+  NAMA_LENGKAP: string;
+  TANGGAL_LAHIR: string;
+  JENIS_KELAMIN: 'L' | 'P';
+  GOLONGAN_DARAH: string;
   ALAMAT: string;
-  no_telepon: string;
+  NO_TELEPON: string;
   EMAIL: string;
   password: string;
-  konfirmasiPassword: string;
 }
 
 // Beranda

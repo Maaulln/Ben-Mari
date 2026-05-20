@@ -2,7 +2,7 @@ import { Clock, CheckCircle, XCircle, AlertCircle, UserCheck, AlertTriangle, Cre
 
 interface BadgeProps {
   status: string;
-  type?: 'appointment' | 'payment' | 'active' | 'stock';
+  type?: 'appointment' | 'payment' | 'active' | 'stock' | 'antrian';
 }
 
 export function Badge({ status, type = 'appointment' }: BadgeProps) {
@@ -47,6 +47,21 @@ export function Badge({ status, type = 'appointment' }: BadgeProps) {
         case 'N':
         case 'NONAKTIF':
           return { style: 'bg-gray-100 text-gray-500', icon: <XCircle size={12} />, label: 'Nonaktif' };
+        default:
+          return { style: 'bg-gray-100 text-gray-700', icon: null, label: status };
+      }
+    }
+
+    if (type === 'antrian') {
+      switch (status) {
+        case 'MENUNGGU':
+          return { style: 'bg-yellow-100 text-yellow-700', icon: <Clock size={12} />, label: 'Menunggu' };
+        case 'DIPANGGIL':
+          return { style: 'bg-purple-100 text-purple-700', icon: <AlertCircle size={12} />, label: 'Dipanggil' };
+        case 'SELESAI':
+          return { style: 'bg-green-100 text-green-700', icon: <CheckCircle size={12} />, label: 'Selesai' };
+        case 'BATAL':
+          return { style: 'bg-red-100 text-red-700', icon: <XCircle size={12} />, label: 'Batal' };
         default:
           return { style: 'bg-gray-100 text-gray-700', icon: null, label: status };
       }

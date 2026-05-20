@@ -11,7 +11,9 @@ import {
   Settings,
   LogOut,
   Menu,
-  X
+  X,
+  ListOrdered,
+  FlaskConical
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -31,6 +33,8 @@ export function Sidebar({ currentPage, onNavigate, user, onLogout }: SidebarProp
     { id: 'appointment', label: 'Appointment', icon: Calendar },
     { id: 'rekam-medis', label: 'Rekam Medis', icon: FileText },
     { id: 'obat', label: 'Obat', icon: Pill },
+    { id: 'antrian', label: 'Antrian', icon: ListOrdered },
+    { id: 'resep', label: 'Farmasi', icon: FlaskConical },
     { id: 'tagihan', label: 'Tagihan', icon: Receipt },
     { id: 'laporan', label: 'Laporan', icon: BarChart2 },
     { id: 'pengaturan', label: 'Pengaturan', icon: Settings },
