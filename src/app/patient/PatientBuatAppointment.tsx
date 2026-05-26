@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, ArrowRight, Check, Calendar as CalendarIcon, Clock, DollarSign, Stethoscope } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, Calendar as CalendarIcon, Clock, DollarSign, Printer, Stethoscope } from 'lucide-react';
 import {
   getDokterTersedia,
   getSlotJamTersedia,
+  getEstimasiMasukDokter,
   createAppointment,
   DokterPublic,
   SlotJam,
@@ -34,6 +35,8 @@ export function PatientBuatAppointment({
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [nomorAntrian, setNomorAntrian] = useState(0);
+  const [estimasiMasukJam, setEstimasiMasukJam] = useState<string | null>(null);
+  const [printing, setPrinting] = useState(false);
 
   useEffect(() => {
     loadDokter();
@@ -89,12 +92,50 @@ export function PatientBuatAppointment({
       });
 
       setNomorAntrian(result.nomor_antrian);
+      setEstimasiMasukJam(null);
       setShowSuccess(true);
+
+      // Ambil estimasi awal untuk ditampilkan di layar sukses
+      try {
+        const estimasi = await getEstimasiMasukDokter(
+          selectedDokter.dokter_id,
+          selectedTanggal,
+          result.nomor_antrian
+        );
+        setEstimasiMasukJam(estimasi.jam_estimasi_masuk);
+      } catch (error) {
+        console.error('Error fetching estimasi masuk (post-booking):', error);
+      }
     } catch (error) {
       console.error('Error creating appointment:', error);
       alert('Gagal membuat appointment. Silakan coba lagi.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePrintStruk = async () => {
+    if (!selectedDokter || !selectedTanggal || !nomorAntrian) {
+      window.print();
+      return;
+    }
+
+    try {
+      setPrinting(true);
+      const estimasi = await getEstimasiMasukDokter(
+        selectedDokter.dokter_id,
+        selectedTanggal,
+        nomorAntrian
+      );
+      setEstimasiMasukJam(estimasi.jam_estimasi_masuk);
+    } catch (error) {
+      console.error('Error fetching estimasi masuk:', error);
+      setEstimasiMasukJam(null);
+    } finally {
+      window.setTimeout(() => {
+        window.print();
+        setPrinting(false);
+      }, 50);
     }
   };
 
@@ -106,39 +147,88 @@ export function PatientBuatAppointment({
   // Success Screen
   if (showSuccess) {
     return (
-      <div className="min-h-screen bg-[#F0FDF9] flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Check className="text-green-600" size={40} />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Booking Berhasil!</h2>
-          <p className="text-gray-600 mb-6">Appointment Anda telah terdaftar</p>
+      <div className="min-h-screen bg-[#F0FDF9] p-4">
+        <div className="no-print flex items-center justify-center">
+          <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
+            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Check className="text-green-600" size={40} />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Booking Berhasil!</h2>
+            <p className="text-gray-600 mb-6">Appointment Anda telah terdaftar</p>
 
-          <div className="bg-[#0F766E] bg-opacity-10 rounded-xl p-6 mb-6">
-            <p className="text-sm text-gray-600 mb-2">Nomor Antrian Anda</p>
-            <p className="text-5xl font-bold text-[#0F766E] mb-4">{nomorAntrian}</p>
-            <div className="border-t border-[#0F766E] border-opacity-20 pt-4 text-left space-y-2">
-              <p className="text-sm">
-                <span className="text-gray-600">Dokter:</span>{' '}
-                <span className="font-medium">{selectedDokter?.nama_dokter}</span>
-              </p>
-              <p className="text-sm">
-                <span className="text-gray-600">Tanggal:</span>{' '}
-                <span className="font-medium">{formatDate(selectedTanggal)}</span>
-              </p>
-              <p className="text-sm">
-                <span className="text-gray-600">Jam:</span>{' '}
-                <span className="font-medium">{selectedJam}</span>
-              </p>
+            <div className="bg-[#0F766E] bg-opacity-10 rounded-xl p-6 mb-6">
+              <p className="text-sm text-gray-600 mb-2">Nomor Antrian Anda</p>
+              <p className="text-5xl font-bold text-[#0F766E] mb-4">{nomorAntrian}</p>
+              <div className="border-t border-[#0F766E] border-opacity-20 pt-4 text-left space-y-2">
+                <p className="text-sm">
+                  <span className="text-gray-600">Dokter:</span>{' '}
+                  <span className="font-medium">{selectedDokter?.nama_dokter}</span>
+                </p>
+                <p className="text-sm">
+                  <span className="text-gray-600">Tanggal:</span>{' '}
+                  <span className="font-medium">{formatDate(selectedTanggal)}</span>
+                </p>
+                <p className="text-sm">
+                  <span className="text-gray-600">Perkiraan Masuk Ruangan:</span>{' '}
+                  <span className="font-medium">{estimasiMasukJam ?? selectedJam}</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <button
+                onClick={handlePrintStruk}
+                disabled={printing}
+                className="w-full py-3 border-2 border-[#0F766E] text-[#0F766E] rounded-lg font-medium hover:bg-[#0F766E]/5 transition-colors inline-flex items-center justify-center gap-2"
+              >
+                <Printer size={18} />
+                {printing ? 'Menyiapkan Struk...' : 'Cetak Struk'}
+              </button>
+
+              <button
+                onClick={onSuccess}
+                className="w-full py-3 bg-[#0F766E] hover:bg-[#0D6B64] text-white rounded-lg font-medium"
+              >
+                Kembali ke Beranda
+              </button>
             </div>
           </div>
+        </div>
 
-          <button
-            onClick={onSuccess}
-            className="w-full py-3 bg-[#0F766E] hover:bg-[#0D6B64] text-white rounded-lg font-medium"
-          >
-            Kembali ke Beranda
-          </button>
+        {/* Print-only: Struk */}
+        <div className="print-only">
+          <div className="min-h-screen bg-white p-6">
+            <div className="mx-auto max-w-sm text-gray-900">
+              <div className="text-center">
+                <h1 className="text-xl font-bold">Klinik BenMari</h1>
+                <p className="text-sm text-gray-600">Struk Antrian Pasien</p>
+              </div>
+
+              <div className="mt-6 border-t border-b border-gray-300 py-6 text-center">
+                <p className="text-sm text-gray-600">Nomor Antrian</p>
+                <p className="text-6xl font-bold tracking-wide">{nomorAntrian}</p>
+              </div>
+
+              <div className="mt-6 space-y-2 text-sm">
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-600">Dokter</span>
+                  <span className="font-medium text-right">{selectedDokter?.nama_dokter}</span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-600">Spesialis</span>
+                  <span className="font-medium text-right">{selectedDokter?.spesialisasi}</span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-600">Tanggal</span>
+                  <span className="font-medium text-right">{formatDate(selectedTanggal)}</span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-600">Perkiraan Masuk Ruangan</span>
+                  <span className="font-medium text-right">{estimasiMasukJam ?? selectedJam}</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     );
@@ -150,7 +240,12 @@ export function PatientBuatAppointment({
       <div className="bg-white border-b sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4">
           <div className="flex items-center gap-4">
-            <button onClick={onBack} className="text-gray-600 hover:text-gray-900">
+            <button
+              type="button"
+              onClick={onBack}
+              aria-label="Kembali"
+              className="text-gray-600 hover:text-gray-900"
+            >
               <ArrowLeft size={24} />
             </button>
             <div className="flex-1">
@@ -180,10 +275,14 @@ export function PatientBuatAppointment({
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Pilih Dokter</h2>
 
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="filterSpesialisasi"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Filter Spesialisasi
               </label>
               <select
+                id="filterSpesialisasi"
                 value={filterSpesialisasi}
                 onChange={(e) => setFilterSpesialisasi(e.target.value)}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
@@ -251,10 +350,14 @@ export function PatientBuatAppointment({
             </div>
 
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label
+                htmlFor="tanggalAppointment"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Pilih Tanggal
               </label>
               <input
+                id="tanggalAppointment"
                 type="date"
                 value={selectedTanggal}
                 onChange={(e) => {

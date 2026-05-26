@@ -7,7 +7,7 @@ services:
       - "1521:1521"
     environment:
       ORACLE_PASSWORD: "050621"
-      APP_USER: "C##KLINIK_ADMIN"
+      APP_USER: "KLINIK_ADMIN"
       APP_USER_PASSWORD: "klinik123"
     volumes:
       - oracle_data:/opt/oracle/oradata
@@ -40,8 +40,8 @@ services:
       DB_HOST: oracle-db
       DB_PORT: 1521
       DB_DATABASE: FREE
-      DB_SERVICE_NAME: FREE
-      DB_USERNAME: "C##KLINIK_ADMIN"
+      DB_SERVICE_NAME: FREEPDB1
+      DB_USERNAME: "KLINIK_ADMIN"
       DB_PASSWORD: klinik123
       DB_CHARSET: AL32UTF8
       LOG_CHANNEL: stack

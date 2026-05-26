@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Antrian;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class AntrianController extends Controller
@@ -87,7 +88,35 @@ class AntrianController extends Controller
             'status' => 'required|in:MENUNGGU,DIPANGGIL,SELESAI,BATAL',
         ]);
 
-        $antrian->update($validated);
+        $status = $validated['status'];
+        $now = Carbon::now();
+
+        if ($status === 'DIPANGGIL') {
+            if (empty($antrian->waktu_dipanggil)) {
+                $antrian->waktu_dipanggil = $now;
+            }
+            $antrian->waktu_selesai = null;
+        }
+
+        if ($status === 'SELESAI') {
+            if (empty($antrian->waktu_dipanggil)) {
+                $antrian->waktu_dipanggil = $now;
+            }
+            $antrian->waktu_selesai = $now;
+        }
+
+        if ($status === 'MENUNGGU') {
+            $antrian->waktu_dipanggil = null;
+            $antrian->waktu_selesai = null;
+        }
+
+        if ($status === 'BATAL') {
+            // Biarkan waktu_dipanggil tetap (jika sudah pernah dipanggil), tapi kosongkan waktu_selesai
+            $antrian->waktu_selesai = null;
+        }
+
+        $antrian->status = $status;
+        $antrian->save();
 
         return response()->json([
             'status' => 'success',

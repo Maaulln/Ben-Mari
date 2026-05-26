@@ -50,12 +50,14 @@ class SesiPraktikSeeder extends Seeder
             if ($current->isWeekday()) {
                 foreach ($dokters as $dokter) {
                     foreach ($sesiConfig as $config) {
-                        $exists = SesiPraktik::where('dokter_id', $dokter->dokter_id)
+                        // NOTE: Pada Oracle, kombinasi whereDate(...)->exists() bisa tidak konsisten.
+                        // Pakai query ringan yang mengambil 1 kolom untuk cek keberadaan data.
+                        $existingId = SesiPraktik::where('dokter_id', $dokter->dokter_id)
                             ->whereDate('tanggal', $current->toDateString())
                             ->where('sesi', $config['sesi'])
-                            ->exists();
+                            ->value('sesi_id');
 
-                        if ($exists) {
+                        if ($existingId !== null) {
                             $skipped++;
                             continue;
                         }

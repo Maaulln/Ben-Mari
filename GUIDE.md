@@ -34,7 +34,7 @@ Pastikan sudah terinstall:
 ```bash
 git clone <repo-url>
 cd Ben-Mari
-npm install
+npminstall 
 ```
 
 ### 2. Jalankan Docker (Backend + Database)

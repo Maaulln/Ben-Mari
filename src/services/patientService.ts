@@ -169,7 +169,8 @@ export const createAppointment = async (
   data: CreateAppointmentRequest
 ): Promise<AppointmentPasien> => {
   const response = await api.post('/appointment', data);
-  return response.data;
+  // Backend kadang membungkus payload sebagai { status, data }
+  return response.data?.data ?? response.data;
 };
 
 export const cancelAppointment = async (appointmentId: number): Promise<void> => {
@@ -278,6 +279,31 @@ export const getAntrianPasien = async (
     params: {
       pasien_id: pasienId,
       tanggal: tanggal || new Date().toISOString().split('T')[0],
+    },
+  });
+  return response.data?.data ?? response.data;
+};
+
+// Estimasi masuk ruangan berdasarkan progres antrian dokter
+export interface EstimasiMasuk {
+  dokter_id: number;
+  tanggal: string;
+  nomor_antrian: number;
+  avg_durasi_menit: number;
+  estimasi_masuk: string;
+  jam_estimasi_masuk: string;
+  estimasi_menunggu_menit: number;
+}
+
+export const getEstimasiMasukDokter = async (
+  dokterId: number,
+  tanggal: string,
+  nomorAntrian: number
+): Promise<EstimasiMasuk> => {
+  const response = await api.get(`/dokter/${dokterId}/estimasi-masuk`, {
+    params: {
+      tanggal,
+      nomor_antrian: nomorAntrian,
     },
   });
   return response.data?.data ?? response.data;

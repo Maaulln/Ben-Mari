@@ -49,6 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dokter/{dokter}', [DokterController::class, 'show']);
     Route::get('/dokter/{dokter}/jadwal',         [DokterController::class, 'jadwal']);
     Route::get('/dokter/{dokter}/slot-jam',        [DokterController::class, 'slotJam']);
+    Route::get('/dokter/{dokter}/estimasi-masuk',  [DokterController::class, 'estimasiMasuk']);
     Route::get('/dokter/{dokter}/dashboard/stats', [DokterController::class, 'dashboardStats']);
     Route::get('/dokter/{dokter}/pasien',          [DokterController::class, 'pasienList']);
 

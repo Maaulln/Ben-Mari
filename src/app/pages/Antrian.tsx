@@ -137,22 +137,30 @@ export function Antrian() {
 
       {/* Filters */}
       <div className="flex gap-3 mb-4 flex-wrap">
-        <input
-          type="date"
-          value={filterTanggal}
-          onChange={(e) => setFilterTanggal(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
-        />
-        <select
-          value={filterDokter}
-          onChange={(e) => setFilterDokter(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
-        >
-          <option value="">Semua Dokter</option>
-          {dokterList.map((d: any) => (
-            <option key={d.dokter_id} value={d.dokter_id}>{d.nama_dokter}</option>
-          ))}
-        </select>
+        <div>
+          <label htmlFor="filterTanggal" className="sr-only">Tanggal</label>
+          <input
+            id="filterTanggal"
+            type="date"
+            value={filterTanggal}
+            onChange={(e) => setFilterTanggal(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+          />
+        </div>
+        <div>
+          <label htmlFor="filterDokter" className="sr-only">Dokter</label>
+          <select
+            id="filterDokter"
+            value={filterDokter}
+            onChange={(e) => setFilterDokter(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+          >
+            <option value="">Semua Dokter</option>
+            {dokterList.map((d: any) => (
+              <option key={d.dokter_id} value={d.dokter_id}>{d.nama_dokter}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-100 shadow-sm overflow-hidden">
@@ -243,8 +251,9 @@ export function Antrian() {
             <h2 className="text-lg font-bold text-gray-900 mb-4">Tambah Pasien Walk-in</h2>
             <form onSubmit={handleWalkinSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Pasien</label>
+                <label htmlFor="walkinPasien" className="block text-sm font-medium text-gray-700 mb-1">Pasien</label>
                 <select
+                  id="walkinPasien"
                   value={walkinForm.pasien_id}
                   onChange={(e) => setWalkinForm({ ...walkinForm, pasien_id: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
@@ -257,8 +266,9 @@ export function Antrian() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Dokter</label>
+                <label htmlFor="walkinDokter" className="block text-sm font-medium text-gray-700 mb-1">Dokter</label>
                 <select
+                  id="walkinDokter"
                   value={walkinForm.dokter_id}
                   onChange={(e) => setWalkinForm({ ...walkinForm, dokter_id: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
@@ -271,8 +281,9 @@ export function Antrian() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
+                <label htmlFor="walkinTanggal" className="block text-sm font-medium text-gray-700 mb-1">Tanggal</label>
                 <input
+                  id="walkinTanggal"
                   type="date"
                   value={filterTanggal}
                   readOnly

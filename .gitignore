@@ -1,0 +1,10 @@
+
+# Frontend build output
+dist/
+
+# Root node_modules
+node_modules/
+
+# Lock files
+package-lock.json
+backend/package-lock.json
