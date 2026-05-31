@@ -148,31 +148,56 @@ export function PatientBuatAppointment({
   if (showSuccess) {
     return (
       <div className="min-h-screen bg-[#F0FDF9] p-4">
-        <div className="no-print flex items-center justify-center">
+        <div className="no-print flex items-center justify-center min-h-screen">
           <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md w-full text-center">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Check className="text-green-600" size={40} />
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Booking Berhasil!</h2>
-            <p className="text-gray-600 mb-6">Appointment Anda telah terdaftar</p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-1">Booking Berhasil!</h2>
+            <p className="text-sm text-gray-500 mb-6">Appointment Anda telah terdaftar</p>
 
-            <div className="bg-[#0F766E] bg-opacity-10 rounded-xl p-6 mb-6">
-              <p className="text-sm text-gray-600 mb-2">Nomor Antrian Anda</p>
-              <p className="text-5xl font-bold text-[#0F766E] mb-4">{nomorAntrian}</p>
-              <div className="border-t border-[#0F766E] border-opacity-20 pt-4 text-left space-y-2">
-                <p className="text-sm">
-                  <span className="text-gray-600">Dokter:</span>{' '}
-                  <span className="font-medium">{selectedDokter?.nama_dokter}</span>
-                </p>
-                <p className="text-sm">
-                  <span className="text-gray-600">Tanggal:</span>{' '}
-                  <span className="font-medium">{formatDate(selectedTanggal)}</span>
-                </p>
-                <p className="text-sm">
-                  <span className="text-gray-600">Perkiraan Masuk Ruangan:</span>{' '}
-                  <span className="font-medium">{estimasiMasukJam ?? selectedJam}</span>
-                </p>
+            <div className="rounded-xl overflow-hidden border border-gray-200 mb-4">
+              {/* Nomor antrian — teal solid, teks putih */}
+              <div className="bg-[#0F766E] py-5 px-5 text-center">
+                <p className="text-xs text-teal-100 uppercase tracking-widest mb-2">Nomor Antrian</p>
+                <p className="text-6xl font-bold text-white">{nomorAntrian}</p>
               </div>
+
+              {/* Detail — putih, teks gelap */}
+              <div className="bg-white px-5 py-4 space-y-3 text-left">
+                {/* Dokter */}
+                <div className="flex items-start justify-between gap-4">
+                  <span className="text-sm text-gray-500 shrink-0 mt-0.5">Dokter</span>
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-gray-900">{selectedDokter?.nama_dokter}</p>
+                    <p className="text-xs text-[#0F766E] font-medium">{selectedDokter?.spesialisasi}</p>
+                  </div>
+                </div>
+                {/* Tanggal */}
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-sm text-gray-500">Tanggal</span>
+                  <span className="text-sm font-semibold text-gray-900">{formatDate(selectedTanggal)}</span>
+                </div>
+                {/* Jam booking */}
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-sm text-gray-500">Jam Booking</span>
+                  <span className="text-sm font-semibold text-gray-900">{selectedJam}</span>
+                </div>
+                {/* Estimasi masuk */}
+                <div className="flex items-center justify-between gap-4 border-t border-gray-100 pt-3">
+                  <span className="text-sm text-gray-500">Estimasi Masuk Ruangan</span>
+                  <span className="text-sm font-bold text-[#0F766E]">
+                    {estimasiMasukJam ?? selectedJam}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Next step hint */}
+            <div className="bg-blue-50 border border-blue-100 rounded-lg px-4 py-3 mb-5 text-left">
+              <p className="text-xs text-blue-700 leading-relaxed">
+                <span className="font-semibold">Langkah selanjutnya:</span> Datang ke klinik sesuai jadwal, lalu lakukan <span className="font-semibold">check-in</span> di resepsionis untuk mendapatkan nomor antrian.
+              </p>
             </div>
 
             <div className="space-y-3">
@@ -223,7 +248,11 @@ export function PatientBuatAppointment({
                   <span className="font-medium text-right">{formatDate(selectedTanggal)}</span>
                 </div>
                 <div className="flex justify-between gap-4">
-                  <span className="text-gray-600">Perkiraan Masuk Ruangan</span>
+                  <span className="text-gray-600">Jam Booking</span>
+                  <span className="font-medium text-right">{selectedJam}</span>
+                </div>
+                <div className="flex justify-between gap-4">
+                  <span className="text-gray-600">Estimasi Masuk Ruangan</span>
                   <span className="font-medium text-right">{estimasiMasukJam ?? selectedJam}</span>
                 </div>
               </div>

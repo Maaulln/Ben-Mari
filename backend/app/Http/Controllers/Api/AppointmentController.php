@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Antrian;
 use App\Models\Appointment;
+use App\Models\SesiPraktik;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -61,10 +62,33 @@ class AppointmentController extends Controller
             'dokter_id'       => 'required|exists:dokter,dokter_id',
             'tgl_appointment' => 'required|date',
             'jam_appointment' => 'required',
+            'sesi_id'         => 'nullable|exists:sesi_praktik,sesi_id',
             'nomor_antrian'   => 'nullable|integer',
             'keluhan_awal'    => 'nullable',
             'status'          => 'nullable|in:MENUNGGU,DIKONFIRMASI,HADIR,SELESAI,BATAL,ABSEN',
         ]);
+
+        // Validasi konflik waktu — minimal jarak 30 menit dari appointment lain
+        $jamTarget = Carbon::parse(
+            $validated['tgl_appointment'] . ' ' . substr($validated['jam_appointment'], 0, 5)
+        );
+
+        $bookedJams = Appointment::where('dokter_id', $validated['dokter_id'])
+            ->whereDate('tgl_appointment', $validated['tgl_appointment'])
+            ->whereNotIn('status', ['BATAL', 'ABSEN'])
+            ->pluck('jam_appointment')
+            ->map(fn($j) => Carbon::parse(
+                $validated['tgl_appointment'] . ' ' . substr($j, 0, 5)
+            ));
+
+        foreach ($bookedJams as $bookedTime) {
+            if (abs($jamTarget->diffInMinutes($bookedTime)) < 30) {
+                return response()->json([
+                    'status'  => 'error',
+                    'message' => 'Jam ini sudah dipesan atau terlalu dekat dengan appointment lain. Pilih jam lain (minimal jarak 30 menit).',
+                ], 422);
+            }
+        }
 
         // Generate nomor antrian otomatis
         $validated['nomor_antrian'] = Appointment::whereDate(
@@ -78,14 +102,17 @@ class AppointmentController extends Controller
         $validated['status'] = $validated['status'] ?? 'MENUNGGU';
 
         // Hitung batas_hadir = tanggal_jam + 15 menit grace period
-        if (!empty($validated['jam_appointment'])) {
-            $tanggalJam = Carbon::parse(
-                $validated['tgl_appointment'] . ' ' . $validated['jam_appointment']
-            );
-            $validated['batas_hadir'] = $tanggalJam->addMinutes(15);
-        }
+        $tanggalJam = Carbon::parse(
+            $validated['tgl_appointment'] . ' ' . $validated['jam_appointment']
+        );
+        $validated['batas_hadir'] = $tanggalJam->addMinutes(15);
 
         $appointment = Appointment::create($validated);
+
+        // Update jumlah terisi di sesi_praktik
+        if (!empty($validated['sesi_id'])) {
+            SesiPraktik::where('sesi_id', $validated['sesi_id'])->increment('terisi');
+        }
 
         return response()->json([
             'status' => 'success',

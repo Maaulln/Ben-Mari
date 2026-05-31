@@ -107,20 +107,33 @@ class DokterController extends Controller
             return response()->json([]);
         }
 
+        // Jam yang sudah dipesan pasien lain (exclude BATAL & ABSEN)
+        $bookedJams = Appointment::where('dokter_id', $dokterId)
+            ->whereDate('tgl_appointment', $tanggal)
+            ->whereNotIn('status', ['BATAL', 'ABSEN'])
+            ->pluck('jam_appointment')
+            ->map(fn($j) => Carbon::parse(substr($j, 0, 5)))
+            ->values();
+
         $slots = [];
 
         foreach ($sesiList as $sesi) {
-            $mulai    = Carbon::parse($sesi->jam_mulai);
-            $selesai  = Carbon::parse($sesi->jam_selesai);
-            $tersedia = $sesi->status === 'BUKA' && $sesi->terisi < $sesi->kuota;
+            $mulai       = Carbon::parse($sesi->jam_mulai);
+            $selesai     = Carbon::parse($sesi->jam_selesai);
+            $sesiTersedia = $sesi->status === 'BUKA' && $sesi->terisi < $sesi->kuota;
 
             $current = $mulai->copy();
             while ($current < $selesai) {
+                // Slot tidak tersedia jika ada booking dalam jarak 30 menit
+                $konflik = $sesiTersedia && $bookedJams->contains(
+                    fn($booked) => abs($current->diffInMinutes($booked)) < 30
+                );
+
                 $slots[] = [
                     'sesi_id'  => $sesi->sesi_id,
                     'sesi'     => $sesi->sesi,
                     'jam'      => $current->format('H:i'),
-                    'tersedia' => $tersedia,
+                    'tersedia' => $sesiTersedia && !$konflik,
                 ];
                 $current->addHour();
             }
