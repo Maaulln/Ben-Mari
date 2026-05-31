@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Modal } from '../components/Modal';
 import { Badge } from '../components/Badge';
-import { Plus, Edit2 } from 'lucide-react';
+import { Plus, Edit2, Calendar, Trash2, Clock } from 'lucide-react';
 import { Dokter as DokterType } from '../../data/mockData';
 import { formatRupiah } from '../../utils/formatters';
 import {
@@ -12,6 +12,13 @@ import {
 
 import * as adminService from '../../services/adminService';
 import { toast } from 'sonner';
+
+const HARI_OPTIONS = ['SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU', 'MINGGU'];
+
+const HARI_LABEL: Record<string, string> = {
+  SENIN: 'Senin', SELASA: 'Selasa', RABU: 'Rabu',
+  KAMIS: 'Kamis', JUMAT: 'Jumat', SABTU: 'Sabtu', MINGGU: 'Minggu',
+};
 
 export function Dokter() {
   const [dokterList, setDokterList] =
@@ -72,6 +79,73 @@ export function Dokter() {
 
   const [formErrors, setFormErrors] =
     useState<Record<string, string>>({});
+
+  // ── Jadwal modal state ──
+  const [isJadwalModalOpen, setIsJadwalModalOpen] = useState(false);
+  const [jadwalDokter, setJadwalDokter] = useState<DokterType | null>(null);
+  const [jadwalList, setJadwalList] = useState<any[]>([]);
+  const [jadwalLoading, setJadwalLoading] = useState(false);
+  const [jadwalForm, setJadwalForm] = useState({
+    hari: 'SENIN',
+    jam_mulai: '08:00',
+    jam_selesai: '16:00',
+    kuota: 20,
+  });
+  const [jadwalFormError, setJadwalFormError] = useState('');
+
+  const fetchJadwal = async (dokterId: number) => {
+    try {
+      setJadwalLoading(true);
+      const data = await adminService.getJadwalDokterTemplate(dokterId);
+      setJadwalList(data);
+    } catch {
+      toast.error('Gagal memuat jadwal dokter');
+    } finally {
+      setJadwalLoading(false);
+    }
+  };
+
+  const handleOpenJadwalModal = (dokter: DokterType) => {
+    setJadwalDokter(dokter);
+    setJadwalList([]);
+    setJadwalForm({ hari: 'SENIN', jam_mulai: '08:00', jam_selesai: '16:00', kuota: 20 });
+    setJadwalFormError('');
+    setIsJadwalModalOpen(true);
+    fetchJadwal(dokter.DOKTER_ID);
+  };
+
+  const handleAddJadwal = async () => {
+    if (!jadwalDokter) return;
+    if (jadwalForm.jam_mulai >= jadwalForm.jam_selesai) {
+      setJadwalFormError('Jam selesai harus lebih dari jam mulai');
+      return;
+    }
+    setJadwalFormError('');
+    try {
+      await adminService.createJadwalDokter({
+        dokter_id: jadwalDokter.DOKTER_ID,
+        hari: jadwalForm.hari,
+        jam_mulai: jadwalForm.jam_mulai,
+        jam_selesai: jadwalForm.jam_selesai,
+        kuota: jadwalForm.kuota,
+      });
+      toast.success('Jadwal berhasil ditambahkan');
+      fetchJadwal(jadwalDokter.DOKTER_ID);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Gagal menambahkan jadwal');
+    }
+  };
+
+  const handleDeleteJadwal = async (jadwalId: number) => {
+    if (!jadwalDokter) return;
+    try {
+      await adminService.deleteJadwalDokter(jadwalId);
+      toast.success('Jadwal berhasil dihapus');
+      fetchJadwal(jadwalDokter.DOKTER_ID);
+    } catch {
+      toast.error('Gagal menghapus jadwal');
+    }
+  };
 
   // Filter dokter by spesialisasi
   const filteredDokter =
@@ -314,16 +388,26 @@ export function Dokter() {
                 </p>
               </div>
 
-              <button
-                onClick={() =>
-                  handleOpenModal(
-                    dokter
-                  )
-                }
-                className="text-blue-600 hover:text-blue-800 transition-colors"
-              >
-                <Edit2 size={18} />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleOpenJadwalModal(dokter)}
+                  className="text-teal-600 hover:text-teal-800 transition-colors"
+                  title="Kelola Jadwal"
+                >
+                  <Calendar size={18} />
+                </button>
+                <button
+                  onClick={() =>
+                    handleOpenModal(
+                      dokter
+                    )
+                  }
+                  className="text-blue-600 hover:text-blue-800 transition-colors"
+                  title="Edit Dokter"
+                >
+                  <Edit2 size={18} />
+                </button>
+              </div>
             </div>
 
             {/* Details */}
@@ -387,6 +471,111 @@ export function Dokter() {
           </div>
         ))}
       </div>
+
+      {/* Modal Jadwal */}
+      <Modal
+        isOpen={isJadwalModalOpen}
+        onClose={() => setIsJadwalModalOpen(false)}
+        title={`Jadwal – ${jadwalDokter?.NAMA_DOKTER ?? ''}`}
+        size="lg"
+      >
+        <div className="space-y-5">
+          {/* Form tambah jadwal */}
+          <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+            <h4 className="text-sm font-semibold text-gray-700">Tambah Jadwal Baru</h4>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Hari</label>
+                <select
+                  value={jadwalForm.hari}
+                  onChange={(e) => setJadwalForm({ ...jadwalForm, hari: e.target.value })}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                >
+                  {HARI_OPTIONS.map((h) => (
+                    <option key={h} value={h}>{HARI_LABEL[h]}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Kuota Pasien</label>
+                <input
+                  type="number"
+                  min={1}
+                  max={200}
+                  value={jadwalForm.kuota}
+                  onChange={(e) => setJadwalForm({ ...jadwalForm, kuota: Number(e.target.value) })}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Jam Mulai</label>
+                <input
+                  type="time"
+                  value={jadwalForm.jam_mulai}
+                  onChange={(e) => setJadwalForm({ ...jadwalForm, jam_mulai: e.target.value })}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Jam Selesai</label>
+                <input
+                  type="time"
+                  value={jadwalForm.jam_selesai}
+                  onChange={(e) => setJadwalForm({ ...jadwalForm, jam_selesai: e.target.value })}
+                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0F766E]"
+                />
+              </div>
+            </div>
+            {jadwalFormError && (
+              <p className="text-red-500 text-xs">{jadwalFormError}</p>
+            )}
+            <button
+              onClick={handleAddJadwal}
+              className="flex items-center gap-2 px-4 py-2 bg-[#0F766E] text-white text-sm rounded-lg hover:bg-[#0D6B64] transition-colors"
+            >
+              <Plus size={16} />
+              Tambah Jadwal
+            </button>
+          </div>
+
+          {/* Daftar jadwal */}
+          <div>
+            <h4 className="text-sm font-semibold text-gray-700 mb-2">Jadwal Terdaftar</h4>
+            {jadwalLoading ? (
+              <p className="text-sm text-gray-400 text-center py-4">Memuat...</p>
+            ) : jadwalList.length === 0 ? (
+              <p className="text-sm text-gray-400 text-center py-4">Belum ada jadwal</p>
+            ) : (
+              <div className="space-y-2">
+                {jadwalList.map((j) => (
+                  <div
+                    key={j.jadwal_id}
+                    className="flex items-center justify-between bg-white border border-gray-200 rounded-lg px-4 py-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-semibold text-white bg-[#0F766E] rounded px-2 py-0.5 w-20 text-center">
+                        {HARI_LABEL[j.hari] ?? j.hari}
+                      </span>
+                      <div className="flex items-center gap-1 text-sm text-gray-700">
+                        <Clock size={14} className="text-gray-400" />
+                        {j.jam_mulai} – {j.jam_selesai}
+                      </div>
+                      <span className="text-xs text-gray-500">Kuota: {j.kuota ?? '-'}</span>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteJadwal(j.jadwal_id)}
+                      className="text-red-500 hover:text-red-700 transition-colors"
+                      title="Hapus jadwal"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </Modal>
 
       {/* Modal Form */}
       <Modal

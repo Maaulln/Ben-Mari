@@ -462,9 +462,9 @@ export const updateStatusAntrian = async (id: number, status: string) => {
 // =========================
 export const getJadwalDokterTemplate = async (dokterId?: number) => {
   const response = await api.get('/jadwal-dokter', {
-    params: { dokter_id: dokterId || '', is_aktif: true },
+    params: { dokter_id: dokterId || '' },
   });
-  return response.data;
+  return response.data.data as any[];
 };
 
 export const createJadwalDokter = async (data: {
@@ -475,7 +475,7 @@ export const createJadwalDokter = async (data: {
   kuota?: number;
 }) => {
   const response = await api.post('/jadwal-dokter', data);
-  return response.data;
+  return response.data.data;
 };
 
 export const deleteJadwalDokter = async (id: number) => {
