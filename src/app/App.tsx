@@ -24,15 +24,27 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<{ nama: string; role: string; id?: number; spesialisasi?: string; nik?: string } | null>(null);
   const [currentPage, setCurrentPage] = useState<PageType>('dashboard');
   const [showRegister, setShowRegister] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('klinik_token');
     const userData = localStorage.getItem('klinik_user');
 
-    if (token && userData) {
-      setIsAuthenticated(true);
-      setCurrentUser(JSON.parse(userData));
+    if (!token || !userData) {
+      setIsCheckingAuth(false);
+      return;
     }
+
+    api.get('/auth/me')
+      .then(() => {
+        setIsAuthenticated(true);
+        setCurrentUser(JSON.parse(userData));
+      })
+      .catch(() => {
+        localStorage.removeItem('klinik_token');
+        localStorage.removeItem('klinik_user');
+      })
+      .finally(() => setIsCheckingAuth(false));
   }, []);
 
   const handleLogin = async (email: string, password: string): Promise<boolean> => {
@@ -69,6 +81,14 @@ export default function App() {
   const handleNavigate = (page: string) => {
     setCurrentPage(page as PageType);
   };
+
+  if (isCheckingAuth) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-[#F8FAFC]">
+        <div className="text-gray-400 text-sm">Memuat...</div>
+      </div>
+    );
+  }
 
   // Show register page
   if (showRegister) {
