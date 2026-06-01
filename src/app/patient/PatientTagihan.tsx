@@ -252,80 +252,75 @@ export function PatientTagihan({
 
           <div className="space-y-4">
 
-            <div className="bg-gray-50 rounded-lg p-4">
-
-              <p className="text-sm text-gray-600 mb-1">
-                Tanggal Tagihan
-              </p>
-
-              <p className="font-semibold text-gray-900">
-                {formatDate(selectedTagihan.tgl_tagihan)}
-              </p>
-
+            <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+              {selectedTagihan.appointment?.dokter?.nama_dokter && (
+                <div className="flex items-center gap-2">
+                  <Stethoscope size={14} className="text-gray-400 shrink-0" />
+                  <span className="font-semibold text-gray-900 text-sm">
+                    {selectedTagihan.appointment.dokter.nama_dokter}
+                  </span>
+                </div>
+              )}
+              <div>
+                <p className="text-xs text-gray-500">Tanggal Tagihan</p>
+                <p className="font-medium text-gray-900 text-sm">
+                  {formatDate(selectedTagihan.tgl_tagihan)}
+                </p>
+              </div>
             </div>
 
             <div>
-
               <p className="text-sm font-medium text-gray-700 mb-2">
                 Rincian Biaya
               </p>
 
               <div className="space-y-2">
-
-                <div className="flex justify-between">
-
-                  <span className="text-gray-600">
-                    Biaya Konsultasi
-                  </span>
-
-                  <span className="font-medium">
-                    {formatRupiah(selectedTagihan.biaya_konsultasi)}
-                  </span>
-
-                </div>
-
-                <div className="flex justify-between">
-
-                  <span className="text-gray-600">
-                    Biaya Obat
-                  </span>
-
-                  <span className="font-medium">
-                    {formatRupiah(selectedTagihan.biaya_obat)}
-                  </span>
-
-                </div>
+                {/* Item detail jika ada */}
+                {selectedTagihan.details && selectedTagihan.details.length > 0 ? (
+                  <>
+                    {selectedTagihan.details.map((d) => (
+                      <div key={d.detail_id} className="flex justify-between text-sm">
+                        <span className="text-gray-600">
+                          {d.keterangan}
+                          {d.jumlah > 1 && <span className="text-gray-400"> ×{d.jumlah}</span>}
+                        </span>
+                        <span className="font-medium">{formatRupiah(d.subtotal)}</span>
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Biaya Konsultasi</span>
+                      <span className="font-medium">{formatRupiah(selectedTagihan.biaya_konsultasi)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Biaya Obat</span>
+                      <span className="font-medium">{formatRupiah(selectedTagihan.biaya_obat)}</span>
+                    </div>
+                  </>
+                )}
 
                 <div className="border-t pt-2 flex justify-between">
-
-                  <span className="font-semibold text-gray-900">
-                    Total
-                  </span>
-
+                  <span className="font-semibold text-gray-900">Total</span>
                   <span className="font-bold text-xl text-[#0F766E]">
                     {formatRupiah(selectedTagihan.total_biaya)}
                   </span>
-
                 </div>
-
               </div>
-
             </div>
 
-            <div className="bg-blue-50 rounded-lg p-4">
-
-              <p className="text-sm font-medium text-gray-700 mb-2">
-                Metode Pembayaran
-              </p>
-
-              <p className="text-gray-900">
-                {selectedTagihan.metode_bayar}
-              </p>
-
-              <p className="text-xs text-gray-600 mt-2">
-                Silakan lakukan pembayaran di kasir klinik atau hubungi kami untuk informasi lebih lanjut.
-              </p>
-
+            <div className="bg-blue-50 rounded-lg p-4 space-y-1">
+              <p className="text-sm font-medium text-gray-700">Metode Pembayaran</p>
+              <p className="text-gray-900 font-medium">{selectedTagihan.metode_bayar ?? '—'}</p>
+              <div className="flex items-center gap-1.5 mt-1">
+                <Badge status={selectedTagihan.status_bayar} type="payment" />
+              </div>
+              {selectedTagihan.status_bayar !== 'LUNAS' && (
+                <p className="text-xs text-gray-600 pt-1">
+                  Silakan lakukan pembayaran di kasir klinik.
+                </p>
+              )}
             </div>
 
           </div>

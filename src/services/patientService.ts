@@ -209,20 +209,30 @@ export const getRekamMedisDetail = async (
 };
 
 // Tagihan
+const parseTagihan = (t: any): TagihanPasien => ({
+  ...t,
+  biaya_konsultasi: Number(t.biaya_konsultasi),
+  biaya_obat:       Number(t.biaya_obat),
+  total_biaya:      Number(t.total_biaya),
+  details: t.details?.map((d: any) => ({
+    ...d,
+    harga_satuan: Number(d.harga_satuan),
+    subtotal:     Number(d.harga_satuan) * Number(d.jumlah),
+  })),
+});
+
 export const getTagihanPasien = async (
   pasienId: number
 ): Promise<TagihanPasien[]> => {
   const response = await api.get('/tagihan', {
-    params: {
-      pasien_id: pasienId,
-    },
+    params: { pasien_id: pasienId },
   });
-  return response.data;
+  return (response.data.data ?? response.data).map(parseTagihan);
 };
 
 export const getTagihanDetail = async (tagihanId: number): Promise<TagihanPasien> => {
   const response = await api.get(`/tagihan/${tagihanId}`);
-  return response.data;
+  return parseTagihan(response.data.data ?? response.data);
 };
 
 // Profil
